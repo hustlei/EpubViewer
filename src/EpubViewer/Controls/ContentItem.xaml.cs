@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
 
-namespace EpubHelpViewer
+namespace EpubViewer
 {
     /// <summary>
     /// ContentItem.xaml 的交互逻辑

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -14,7 +15,7 @@ using System.Windows.Shapes;
 using Lei.UI;
 using Lei.Common;
 
-namespace EpubHelpViewer
+namespace EpubViewer
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
@@ -31,7 +32,12 @@ namespace EpubHelpViewer
         private void MordenWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Close();
-        }       
+        }
 
+        private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
     }
 }

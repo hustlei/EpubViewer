@@ -18,7 +18,7 @@ using winform = System.Windows.Forms;
 using System.Windows.Threading;
 using System.ComponentModel;
 
-namespace EpubHelpViewer
+namespace EpubViewer
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
@@ -60,7 +60,7 @@ namespace EpubHelpViewer
                 foreach (string file in files)
                 {
                     epubList.Add(new EpubBook());
-                    epubList[epubList.Count - 1].OpenEpubFile(file);
+                    epubList[epubList.Count - 1].OpenFile(file);
                 }
             };
             backWorker.RunWorkerCompleted += (object seder, RunWorkerCompletedEventArgs e) =>
@@ -234,21 +234,22 @@ namespace EpubHelpViewer
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             foreach (EpubBook b in epubList)
-                b.CloseEpubFile();
+                b.CloseFile();
+            epubList = new List<EpubBook>();
             treeView.Nodes.Clear();
             content.Items.Clear();
         }
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             foreach (EpubBook b in epubList)
-                b.CloseEpubFile();
+                b.CloseFile();
             Environment.Exit(0);
         }
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             foreach (EpubBook b in epubList)
-                b.CloseEpubFile();
+                b.CloseFile();
         }
 
         private void searchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -279,5 +280,23 @@ namespace EpubHelpViewer
                 searchButton_Click(null, null);
         }
 
+        private void MainWindow_OnDragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.All;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+
+        private void MainWindow_OnDrop(object sender, DragEventArgs e)
+        {
+            string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            this.OpenFiles(new string[] {fileName});
+        }
     }
 }

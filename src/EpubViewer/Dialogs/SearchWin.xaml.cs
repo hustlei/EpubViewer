@@ -15,7 +15,7 @@ using Lei.UI;
 using Lei.Common;
 using mshtml;
 
-namespace EpubHelpViewer
+namespace EpubViewer
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑

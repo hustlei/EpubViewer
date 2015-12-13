@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;  
 
-namespace EpubHelpViewer
+namespace EpubViewer
 {
     /// <summary>
     /// LoadingWait.xaml 的交互逻辑

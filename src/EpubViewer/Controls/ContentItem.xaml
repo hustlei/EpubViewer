@@ -1,7 +1,7 @@
-﻿<TabItem x:Class="EpubHelpViewer.ContentItem"
+﻿<TabItem x:Class="EpubViewer.ContentItem"
          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" MinWidth="80" MaxWidth="200"
-         xmlns:local="clr-namespace:EpubHelpViewer" 
+         xmlns:local="clr-namespace:EpubViewer" 
          Style="{DynamicResource MordenTabItemWithClose}">
     <WindowsFormsHost>
         <WebBrowser xmlns="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"

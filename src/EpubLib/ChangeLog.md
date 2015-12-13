@@ -1,6 +1,19 @@
 ﻿## Changelog
 
-+ **1.0.0.1235 : 2015.12.10**
++ **1.0.0.1240 : 2015.12.11**
+    - **Features**
+	- 打开文件函数改为OpenFile,关闭文件函数改为CloseFile
+	- 标题属性改为Title,文档信息属性改为Information
+	- 添加公开函数和属性的说明
+	- 重构方法和属性名称,名称更加易懂
+	- 重构方法和属性名，Public方法和属性全部用Pascal方法命名，非Public方法和属性用Camel法命名
+
+	- **Info**
+
+    - **Bug Fixes**
+    - @hustlei 
+
++ **1.0.0.1230 : 2015.12.10**
     - **Features**
 	- 改为只能读取一个Epub文档，如果要读取多个Epub文档，请用多个EpubBook实例
 	- TreeNode代替TreeView存储文档目录，更加灵活

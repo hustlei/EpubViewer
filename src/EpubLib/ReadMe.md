@@ -10,16 +10,16 @@ EpubLib是一个C#版本的读取Epub文档的类库。基于.NetFramework 4.0�
 EpubLib内仅包含一个类EpubBook，可以读取一个Epub文件，EpubBook类的主要函数和属性有：
 
 + 方法/函数：
-    - OpenEpubFile(string filename)：读取epubfile
-    - CloseEpubFile():关闭文档，清空所有属性，删除缓存文档，在程序关闭前必须调用该函数，否则会占用系统临时目录空间。
+    - OpenFile(string filename)：读取epubfile
+    - CloseFile():关闭文档，清空所有属性，删除缓存文档，在程序关闭前必须调用该函数，否则会占用系统临时目录空间。
 + 属性:
     - TreeNode TreeNode:Epub目录树
     - static ImageList ImageList;按顺序存储文件夹图标、打开的文件夹图标、文件图标
-    - bool isSpine;是否读取顺序阅读目录，默认为否
-    - string EpubFilename：文件名称
-    - string EpubTitle：文件标题
-    - string EpubInformation：文件信息
-	- string StateMsg：过程信息，例如：打开时msg为"Opening..."，没有操作时为null
+    - bool IsSpine;是否读取顺序阅读目录，默认为否
+    - string Filename：文件名称
+    - string Title：文件标题
+    - string Information：文件信息
+	- string StateMsg：过程信息，例如：打开时msg为"Opening..."
 
 
 # License
