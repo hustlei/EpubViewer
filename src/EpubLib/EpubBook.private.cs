@@ -9,7 +9,7 @@ namespace Lei.Common
 {
     partial class EpubBook
     {
-        private string GetTempDirectory()
+        private string getTempDirectory()
         {
             string text = Path.GetRandomFileName();
             text = Path.Combine(Path.GetTempPath(), text);
@@ -155,18 +155,18 @@ namespace Lei.Common
         {
             return string.Format("file:///{0}/" + href, contant_Path).Replace("\\", "/");
         }
-        private string getFileURL(string href)
-        {
-            return ("file:///" + href).Replace("\\", "/");
-        }
+        //private string getFileURL(string href)
+        //{
+        //    return ("file:///" + href).Replace("\\", "/");
+        //}
         private string getFilePath(string url)
         {
             return this.getFileName(url).Replace("file:///", "").Replace("/", "\\");
         }
         private void formatCoverURL(string cover_url)
         {
-            this.Cover_Content = "";
-            this.Cover_URL = "";
+            this.coverContent = "";
+            this.coverUrl = "";
             if (string.IsNullOrEmpty(cover_url))
             {
                 return;
@@ -238,8 +238,8 @@ namespace Lei.Common
                                                                 if (text6 != text)
                                                                 {
                                                                     this.writeFileContent(cover_url, text6);
-                                                                    this.Cover_Content = text;
-                                                                    this.Cover_URL = cover_url;
+                                                                    this.coverContent = text;
+                                                                    this.coverUrl = cover_url;
                                                                 }
                                                             }
                                                         }
@@ -256,8 +256,8 @@ namespace Lei.Common
             }
             catch
             {
-                this.Cover_Content = "";
-                this.Cover_URL = "";
+                this.coverContent = "";
+                this.coverUrl = "";
             }
         }
         private void writeFileContent(string file, string content)

@@ -7,8 +7,8 @@
     <ProjectGuid>{CF467D6A-CCBE-4BBB-A8BA-D864515F53D9}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EpubHelpViewer</RootNamespace>
-    <AssemblyName>EpubHelpViewer</AssemblyName>
+    <RootNamespace>EpubViewer</RootNamespace>
+    <AssemblyName>EpubViewer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -54,7 +54,7 @@
     <ApplicationIcon>Help.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>EpubHelpViewer.App</StartupObject>
+    <StartupObject>EpubViewer.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -152,11 +152,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ChangeLog.md" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Help.ico" />

@@ -1,4 +1,4 @@
-﻿<ui:MordenWindow x:Class="EpubHelpViewer.SearchWin"
+﻿<ui:MordenWindow x:Class="EpubViewer.SearchWin"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Lei.UI;assembly=MordenWin"

@@ -11,32 +11,61 @@ namespace Lei.Common
 {
     public partial class EpubBook
     {
-        public TreeNode TreeNode;
-        public static ImageList ImageList;
-        public bool IsSpine = false;
-        public string EpubFilename = "";
-        public string EpubTitle = "";//从opf文件读取
-        public string EpubInformation = "";//从opf文件读取
-        public string StateMsg = null;
+        /// <summary>
+        /// 存储了4个图标，默认图标为[0]文件夹图标、[1]打开的文件夹图标、[2]选中的文章图标、[3]未选中的文章图标
+        /// </summary>
+        public static ImageList ImageList { get; set; }
+        /// <summary>
+        /// Epub电子书目录树，根节点为书名（根节点链接为封面），二级节点含目录和各个章节
+        /// 每个节点的name存储url，text存储章节/文章名称
+        /// 有子节点的节点的ImageIndex和selectedImageIndex都设置为ImageList的第1个图标（文件夹图标）
+        /// 无子节点的节点ImageIndex设置为ImageList的第3个图标(选中的文章图标)和selectedImageIndex设置为ImageList的第4个图标(未选中的文章图标)
+        /// </summary>
+        public TreeNode TreeNode { get; set; }
+        /// <summary>
+        /// 一般Epub电子书都有树形目录和顺序阅读两种目录，IsSpine=false则TreeNode读取树形目录，否则TreeNode存储顺序阅读目录；
+        /// 在没有树形目录时，会自动读取顺序阅读目录。
+        /// </summary>
+        public bool IsSpine { get; set; }
+        /// <summary>
+        /// Epub电子书文件名(含完整路径)
+        /// </summary>
+        public string Filename = "";
+        /// <summary>
+        /// Epub电子书标题，也是TreeNode根节点内容
+        /// opf文件里的dc:title标签内容，如果没有该标签则为文件名
+        /// </summary>
+        public string Title = "";//从opf文件读取
+        /// <summary>
+        /// Epub电子书的信息，如Creater、Subject、Publisher
+        /// </summary>
+        public string Information = "";//从opf文件读取
+        /// <summary>
+        /// 操作过程信息，如打开时为"opening..."
+        /// </summary>
+        public string StateMsg { get; set; }
 
-        private string Doc_Anchor = "";
-        private List<string> Script_Files = new List<string>();
-        private List<string> XHTML_Files = new List<string>();
-        private List<string> XHTML_Sources = new List<string>();
 
-        private string Cover_Content = "";//从opf文件读取
-        private string Cover_URL = "";//从opf文件读取
+        //private string Doc_Anchor = "";
+        //private List<string> Script_Files = new List<string>();
+        //private List<string> XHTML_Files = new List<string>();
+        //private List<string> XHTML_Sources = new List<string>();
+        //private bool SelectedNode_Flag;
+        //private bool Navigated_Flag;
 
-        private string Encoding_Default = "";
-        private string Encoding_URL = "";
-        private bool Encoding_Reflesh;
+        //private string Encoding_Default = "";
+        //private string Encoding_URL = "";
+        //private bool Encoding_Reflesh;
+        //public static Encoding defaultCoding;
+        //public static string defaultCodingString;
 
-        private bool SelectedNode_Flag;
-        private bool Navigated_Flag;
+        private string tempPath = "";
+        private string coverContent = "";//从opf文件读取
+        private string coverUrl = "";//从opf文件读取
 
-        private string Temp_Path = "";
-        public static Encoding defaultCoding;
-        public static string defaultCodingString;
+        /// <summary>
+        /// 静态构造函数，在构造函数之前，设定静态属性ImageList
+        /// </summary>
         static EpubBook()
         {
             ImageList = new ImageList();
@@ -48,61 +77,65 @@ namespace Lei.Common
         }
         public EpubBook()
         {
-            //tree.ImageList = imagelist;
-            try
-            {
-                defaultCoding = Encoding.Default;
-                defaultCodingString = "System Default (" + defaultCoding.WebName.ToUpper() + ")";
-            }
-            catch
-            {
-            }
+            IsSpine = false;
+            StateMsg = "";
+            //try
+            //{
+            //    defaultCoding = Encoding.Default;
+            //    defaultCodingString = "System Default (" + defaultCoding.WebName.ToUpper() + ")";
+            //}
+            //catch
+            //{
+            //}
         }
-
-        public void OpenEpubFile(string filename)
+        /// <summary>
+        /// 打开一个Epub电子书
+        /// </summary>
+        /// <param name="filename">Epub文档完整路径及文件名</param>
+        public void OpenFile(string filename)
         {
-            CloseEpubFile();
-            if (!this.extractEPUBFile(filename))
+            CloseFile();
+            if (!this.extractEpubFile(filename))
             {
                 MessageBox.Show("Cannot open file \"" + filename + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
-            this.EpubFilename = filename;
-            this.EpubTitle = Path.GetFileNameWithoutExtension(filename);
+            this.Filename = filename;
+            this.Title = Path.GetFileNameWithoutExtension(filename);
             this.readEPUBFile();
             if (TreeNode.Nodes.Count == 0)
             {
                 MessageBox.Show("No book information in file \"" + filename + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
-        public void CloseEpubFile()
+        public void CloseFile()
         {
-            this.EpubFilename = "";
-            this.EpubTitle = "";
-            this.EpubInformation = "";
-            this.Doc_Anchor = "";
-            this.Script_Files.Clear();
-            this.XHTML_Files.Clear();
-            this.XHTML_Sources.Clear();
-            this.SelectedNode_Flag = false;
-            this.Navigated_Flag = false;
-            this.Cover_Content = "";
-            this.Cover_URL = "";
-            this.Encoding_Default = "";
-            this.Encoding_URL = "";
-            this.Encoding_Reflesh = false;
+            this.Filename = "";
+            this.Title = "";
+            this.Information = "";
+            //this.Doc_Anchor = "";
+            //this.Script_Files.Clear();
+            //this.XHTML_Files.Clear();
+            //this.XHTML_Sources.Clear();
+            //this.SelectedNode_Flag = false;
+            //this.Navigated_Flag = false;
+            this.coverContent = "";
+            this.coverUrl = "";
+            //this.Encoding_Default = "";
+            //this.Encoding_URL = "";
+            //this.Encoding_Reflesh = false;
             this.TreeNode = null;
 
             try
             {
-                if (this.Temp_Path != "")
+                if (this.tempPath != "")
                 {
                     this.StateMsg = "Closing...";
                     try
                     {
-                        if (Directory.Exists(this.Temp_Path))
+                        if (Directory.Exists(this.tempPath))
                         {
-                            Directory.Delete(this.Temp_Path, true);
+                            Directory.Delete(this.tempPath, true);
                         }
                     }
                     catch
@@ -114,15 +147,15 @@ namespace Lei.Common
                     }
                     try
                     {
-                        if (Directory.Exists(this.Temp_Path))
+                        if (Directory.Exists(this.tempPath))
                         {
-                            Directory.Delete(this.Temp_Path, true);
+                            Directory.Delete(this.tempPath, true);
                         }
                     }
                     catch
                     {
                     }
-                    this.Temp_Path = "";
+                    this.tempPath = "";
                 }
             }
             catch
@@ -130,42 +163,42 @@ namespace Lei.Common
             }
         }
 
-        protected void readEPUBFile()
+        private void readEPUBFile()
         {
-            if (this.EpubFilename == "")
+            if (this.Filename == "")
             {
                 return;
             }
-            string text = this.Temp_Path + "\\META-INF\\container.xml";
-            if (!File.Exists(text))
+            string containerFile = this.tempPath + "\\META-INF\\container.xml";
+            if (!File.Exists(containerFile))
             {
                 return;
             }
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.XmlResolver = null;
-            xmlDocument.Load(text);
-            List<string> list = new List<string>();
-            XmlNodeList elementsByTagName = xmlDocument.GetElementsByTagName("rootfile");
-            for (int i = 0; i < elementsByTagName.Count; i++)
+            xmlDocument.Load(containerFile);
+            List<string> opfFileList = new List<string>();
+            XmlNodeList rootfileElements = xmlDocument.GetElementsByTagName("rootfile");
+            for (int i = 0; i < rootfileElements.Count; i++)
             {
-                XmlNode xmlNode = elementsByTagName[i].Attributes["full-path"];
+                XmlNode xmlNode = rootfileElements[i].Attributes["full-path"];
                 if (xmlNode != null && xmlNode.Value != "")
                 {
-                    string text2 = this.Temp_Path + "\\" + xmlNode.Value.Replace("/", "\\");
-                    if (File.Exists(text2))
+                    string opfFilename = this.tempPath + "\\" + xmlNode.Value.Replace("/", "\\");
+                    if (File.Exists(opfFilename))
                     {
-                        list.Add(text2);
+                        opfFileList.Add(opfFilename);
                     }
                 }
             }
-            if (list.Count == 0 && File.Exists(this.Temp_Path + "\\content.opf"))
+            if (opfFileList.Count == 0 && File.Exists(this.tempPath + "\\content.opf"))
             {
-                list.Add(this.Temp_Path + "\\content.opf");
+                opfFileList.Add(this.tempPath + "\\content.opf");
             }
             //tree.BeginUpdate();
             //try
             //{
-                foreach (string current in list)
+            foreach (string current in opfFileList)
                 {
                     this.readContentOPF(current);
                 }
@@ -200,7 +233,7 @@ namespace Lei.Common
             {
                 return;
             }
-            string directoryName = Path.GetDirectoryName(content);
+            string contentPath = Path.GetDirectoryName(content);//opf,toc等文件目录
             XmlDocument xmlDocument = new XmlDocument();
             try
             {
@@ -209,85 +242,85 @@ namespace Lei.Common
                 XmlNodeList elementsByTagName = xmlDocument.GetElementsByTagName("dc:title");
                 if (elementsByTagName.Count > 0 && elementsByTagName[0].InnerText != "")
                 {
-                    this.EpubTitle = elementsByTagName[0].InnerText;
+                    this.Title = elementsByTagName[0].InnerText;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
-            #region 读取opf文件内的metadata(设置EPU_Infromation)
+            #region 读取opf文件内的metadata(设置Infromation)
             try
             {
                 XmlNodeList elementsByTagName = xmlDocument.GetElementsByTagName("dc:creator");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Creator: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Creator: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:subject");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Subject: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Subject: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:description");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Description: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Description: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:publisher");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Publisher: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Publisher: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:contributor");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Contributor: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Contributor: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:date");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Date: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Date: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:type");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Type: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Type: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:format");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Formate: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Formate: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:identifier");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Identifiere: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Identifiere: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:source");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Source: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Source: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:language");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Language: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Language: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:relation");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Relation: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Relation: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:coverage");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Coverage: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Coverage: " + elementsByTagName[0].InnerText + "\n";
                 }
                 elementsByTagName = xmlDocument.GetElementsByTagName("dc:rights");
                 if (elementsByTagName.Count > 0)
                 {
-                    this.EpubInformation = this.EpubInformation + "Rights: " + elementsByTagName[0].InnerText + "\n";
+                    this.Information = this.Information + "Rights: " + elementsByTagName[0].InnerText + "\n";
                 }
             }
             catch (Exception ex2)
@@ -321,15 +354,15 @@ namespace Lei.Common
                     {
                         referenceTypeText = elementsByTagName[i].Attributes["type"].Value.ToLower();
                     }
-                    if (!string.IsNullOrEmpty(referenceHrefText) && !string.IsNullOrEmpty(referenceTitleText) && !string.IsNullOrEmpty(referenceTypeText) && (referenceTypeText == "cover" || referenceTypeText == "title-page" || referenceTypeText == "toc" || referenceTypeText == "index" || referenceTypeText == "copyright" || referenceTypeText == "copyright-page" || referenceTypeText == "text") && File.Exists(directoryName + "\\" + this.getFileName(referenceHrefText)))
+                    if (!string.IsNullOrEmpty(referenceHrefText) && !string.IsNullOrEmpty(referenceTitleText) && !string.IsNullOrEmpty(referenceTypeText) && (referenceTypeText == "cover" || referenceTypeText == "title-page" || referenceTypeText == "toc" || referenceTypeText == "index" || referenceTypeText == "copyright" || referenceTypeText == "copyright-page" || referenceTypeText == "text") && File.Exists(contentPath + "\\" + this.getFileName(referenceHrefText)))
                     {
                         referenceHreflist.Add(referenceHrefText);
                         referenceTitlelist.Add(referenceTitleText);
                         referenceTypelist.Add(referenceTypeText);
                     }
-                    if (referenceTypeText == "cover" && !string.IsNullOrEmpty(referenceHrefText) && File.Exists(directoryName + "\\" + this.getFileName(referenceHrefText)))
+                    if (referenceTypeText == "cover" && !string.IsNullOrEmpty(referenceHrefText) && File.Exists(contentPath + "\\" + this.getFileName(referenceHrefText)))
                     {
-                        coverUrltext = this.getFileURL(directoryName, referenceHrefText);
+                        coverUrltext = this.getFileURL(contentPath, referenceHrefText);
                     }
                 }
             }
@@ -352,9 +385,9 @@ namespace Lei.Common
                         menifestHerflist.Add(elementsByTagName[j].Attributes["href"].Value);
                         try
                         {
-                            if (string.IsNullOrEmpty(coverUrltext) && elementsByTagName[j].Attributes["id"].Value.ToLower() == "cover" && File.Exists(directoryName + "\\" + elementsByTagName[j].Attributes["href"].Value))
+                            if (string.IsNullOrEmpty(coverUrltext) && elementsByTagName[j].Attributes["id"].Value.ToLower() == "cover" && File.Exists(contentPath + "\\" + elementsByTagName[j].Attributes["href"].Value))
                             {
-                                coverUrltext = this.getFileURL(directoryName, elementsByTagName[j].Attributes["href"].Value);
+                                coverUrltext = this.getFileURL(contentPath, elementsByTagName[j].Attributes["href"].Value);
                             }
                         }
                         catch
@@ -398,15 +431,16 @@ namespace Lei.Common
             #endregion
 
             //从opfmanifest中获取toc.ncx文件名
-            string toc = directoryName + "\\toc.ncx";
+            string toc = contentPath + "\\toc.ncx";
             int num = manifestIDlist.FindIndex((string s) => s.Equals("ncx", StringComparison.Ordinal));
-            if (num >= 0 && File.Exists(directoryName + "\\" + menifestHerflist[num]))
+            if (num >= 0 && File.Exists(contentPath + "\\" + menifestHerflist[num]))
             {
-                toc = directoryName + "\\" + menifestHerflist[num];
+                toc = contentPath + "\\" + menifestHerflist[num];
             }
             //读取NCX目录
-            TreeNode = new TreeNode(this.EpubTitle, 0, 0);
-            this.readTocNCX(TreeNode, directoryName, toc);
+            TreeNode = new TreeNode(this.Title, 0, 0);
+            if(!IsSpine)
+            this.readTocNCX(TreeNode, toc);
 
             #region TreeNode子节点内插入reference下内容
             try
@@ -416,7 +450,7 @@ namespace Lei.Common
                     for (int m = 0; m < referenceHreflist.Count; m++)
                     {
                         bool flag = false;
-                        string fileURL = this.getFileURL(directoryName, referenceHreflist[m]);
+                        string fileURL = this.getFileURL(contentPath, referenceHreflist[m]);
                         for (int n = 0; n < TreeNode.Nodes.Count; n++)
                         {
                             if (this.equalsFileURL(TreeNode.Nodes[n].Name, fileURL))
@@ -472,7 +506,7 @@ namespace Lei.Common
                 for (int num3 = 0; num3 < spineToclist.Count; num3++)
                 {
                     bool flag3 = false;
-                    string fileURL2 = this.getFileURL(directoryName, spineToclist[num3]);
+                    string fileURL2 = this.getFileURL(contentPath, spineToclist[num3]);
                     for (int num4 = 0; num4 < TreeNode.Nodes.Count; num4++)
                     {
                         if (this.equalsFileURL(TreeNode.Nodes[num4].Name, fileURL2))
@@ -494,30 +528,30 @@ namespace Lei.Common
                 }
             }
             #endregion
-            this.EpubInformation = "Title: " + this.EpubTitle + "\n" + this.EpubInformation;
+            this.Information = "Title: " + this.Title + "\n" + this.Information;
         }
-        protected void readTocNCX(TreeNode content_Node, string contant_Path, string toc)
+        private void readTocNCX(TreeNode rootNode, string toc)
         {
             if (!File.Exists(toc))
             {
                 return;
             }
-            XmlDocument xmlDocument = new XmlDocument();
-            XmlNodeList elementsByTagName;
+            XmlDocument ncxXmlDocument = new XmlDocument();
+            XmlNodeList docTitleElements;
             try
             {
-                xmlDocument.XmlResolver = null;
-                xmlDocument.Load(toc);
-                elementsByTagName = xmlDocument.GetElementsByTagName("docTitle");
-                if (elementsByTagName.Count > 0)
+                ncxXmlDocument.XmlResolver = null;
+                ncxXmlDocument.Load(toc);
+                docTitleElements = ncxXmlDocument.GetElementsByTagName("docTitle");
+                if (docTitleElements.Count > 0)
                 {
-                    XmlNode xmlNode = elementsByTagName[0]["text"];
-                    if (xmlNode != null && xmlNode.InnerText != "" && this.EpubTitle != xmlNode.InnerText)
+                    XmlNode xmlNode = docTitleElements[0]["text"];
+                    if (xmlNode != null && xmlNode.InnerText != "" && this.Title != xmlNode.InnerText)
                     {
-                        this.EpubTitle = xmlNode.InnerText;
+                        this.Title = xmlNode.InnerText;
                         if (TreeNode.Nodes.Count > 0)
                         {
-                            content_Node.Text = this.EpubTitle;
+                            rootNode.Text = this.Title;
                         }
                     }
                 }
@@ -528,14 +562,14 @@ namespace Lei.Common
                 return;
             }
 
+            XmlNode navRootNode = ncxXmlDocument.DocumentElement["navMap"];
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(ncxXmlDocument.NameTable);
+            nsmgr.AddNamespace("ncx", ncxXmlDocument.DocumentElement.NamespaceURI);
 
-            XmlNode navRootNode = xmlDocument.DocumentElement["navMap"];
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(xmlDocument.NameTable);
-            nsmgr.AddNamespace("ncx", xmlDocument.DocumentElement.NamespaceURI);
-
+            string contentPath = Path.GetDirectoryName(toc);
             foreach (XmlNode node in navRootNode.SelectNodes("ncx:navPoint", nsmgr))
             {
-                AddNavPoint(node, content_Node, contant_Path, nsmgr);
+                AddNavPoint(node, rootNode, contentPath, nsmgr);
             }
 
         }
@@ -545,13 +579,13 @@ namespace Lei.Common
         /// </summary>
         /// <param name="node">navpoint节点</param>
         /// <param name="treeNode">将navpoint节点加入treepoint</param>
-        /// <param name="file_Path">contant内链接文件的路径</param>
-        private void AddNavPoint(XmlNode node, TreeNode treeNode, string file_Path, XmlNamespaceManager nsmgr)
+        /// <param name="filePath">contant内链接文件的路径</param>
+        private void AddNavPoint(XmlNode node, TreeNode treeNode, string filePath, XmlNamespaceManager nsmgr)
         {
             XmlNode navText = node["navLabel"]["text"];
             XmlNode navContent = node["content"];
             string text = navText.InnerText;
-            string url = getFileURL(file_Path, navContent.Attributes["src"].Value);
+            string url = getFileURL(filePath, navContent.Attributes["src"].Value);
             XmlNodeList childNavNodes = node.SelectNodes("ncx:navPoint", nsmgr);
             if (childNavNodes.Count > 0)
             {
@@ -561,7 +595,7 @@ namespace Lei.Common
                     {
                         TreeNode currentTreeNode=treeNode.Nodes.Add(url, text,0,0);
                         foreach (XmlNode n in childNavNodes)
-                            AddNavPoint(n, currentTreeNode, file_Path, nsmgr);
+                            AddNavPoint(n, currentTreeNode, filePath, nsmgr);
                     }
                 }
             }
@@ -577,17 +611,17 @@ namespace Lei.Common
             }
         }
 
-        private bool extractEPUBFile(string filename)
+        private bool extractEpubFile(string filename)
         {
             this.StateMsg = "Opening...";
             bool result;
             try
             {
-                this.Temp_Path = this.GetTempDirectory();
+                this.tempPath = this.getTempDirectory();
                 ZipFile zipFile = ZipFile.Read(filename);
                 try
                 {
-                    zipFile.ExtractAll(this.Temp_Path);
+                    zipFile.ExtractAll(this.tempPath);
                     result = true;
                 }
                 catch
@@ -601,19 +635,19 @@ namespace Lei.Common
             }
             finally
             {
-                this.StateMsg = null;
+                this.StateMsg = "";
             }
             return result;
         }
-        private bool readyEPUBFile()
-        {
-            if (this.EpubFilename == "")
-            {
-                MessageBox.Show("Please open a EPUB file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                return false;
-            }
-            return true;
-        }
+        //private bool readyEPUBFile()
+        //{
+        //    if (this.Filename == "")
+        //    {
+        //        MessageBox.Show("Please open a EPUB file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
     }
 }
