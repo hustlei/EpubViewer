@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Help.ico</ApplicationIcon>
+    <ApplicationIcon>epub.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>EpubViewer.App</StartupObject>
@@ -102,6 +102,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Dialogs\ConfigWin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dialogs\AboutWin.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -125,6 +129,9 @@
     </Compile>
     <Compile Include="Dialogs\SearchWin.xaml.cs">
       <DependentUpon>SearchWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ConfigWin.xaml.cs">
+      <DependentUpon>ConfigWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\AboutWin.xaml.cs">
       <DependentUpon>AboutWin.xaml</DependentUpon>
@@ -151,6 +158,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="ChangeLog.md" />
     <None Include="Properties\Settings.settings">
@@ -220,7 +228,20 @@
     <Resource Include="img\loading.gif" />
   </ItemGroup>
   <ItemGroup>
-    <SplashScreen Include="helpviwer.png" />
+    <None Include="helpviwer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="epub.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\epub.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="epubviewer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\close.png" />
+    <Resource Include="img\open.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,5 +1,13 @@
 ﻿## Changelog
 
++ **1.0.0.1430 : 2015.12.15**
+    - **New Features**
+	- OpenFile函数改名为Open
+	- CloseFile函数改名为Close
+
+	- **Bug Fixes**
+	- 修正打开非epub格式zip文件不报错问题
+
 + **1.0.0.1240 : 2015.12.11**
     - **Features**
 	- 打开文件函数改为OpenFile,关闭文件函数改为CloseFile
@@ -7,11 +15,7 @@
 	- 添加公开函数和属性的说明
 	- 重构方法和属性名称,名称更加易懂
 	- 重构方法和属性名，Public方法和属性全部用Pascal方法命名，非Public方法和属性用Camel法命名
-
-	- **Info**
-
-    - **Bug Fixes**
-    - @hustlei 
+	- OpenFile函数返回值改为bool
 
 + **1.0.0.1230 : 2015.12.10**
     - **Features**
