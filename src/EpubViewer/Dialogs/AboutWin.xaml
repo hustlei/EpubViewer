@@ -27,11 +27,12 @@
                     <GradientStop Color="#CC3B93EC" Offset="0.004"/>
                     <GradientStop Color="#CC7ABBF9" Offset="1"/>
                 </LinearGradientBrush>
-            </TextBlock.Foreground>Epub Book Viewer</TextBlock>
+            </TextBlock.Foreground>Epub Viewer <TextBlock Foreground="Gray" FontSize="15">Light Version</TextBlock></TextBlock>
         <Grid Margin="18,2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
+                <RowDefinition Height="2.5*"/>
                 <RowDefinition Height="1.5*"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -42,9 +43,12 @@
                 </Style>
             </Grid.Resources>
             <TextBlock Margin="0,10" FontSize="16" FontWeight="Medium">Epub Viewer 1.1</TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,5">WebSite: <Hyperlink RequestNavigate="Hyperlink_OnRequestNavigate" NavigateUri="http://hustlei.github.io">http://hustlei.github.com</Hyperlink></TextBlock>
-            <TextBlock Grid.Row="2" Foreground="Gray">(c) Hustlei 2015. All Rights Reversed.</TextBlock>
-            <TextBlock Grid.Row="3" Foreground="Gray">hustlei, 2015 @WuHan</TextBlock>
+            <TextBlock Grid.Row="1" FontSize="13" FontWeight="Medium">Epub Viewer 增强版正在开发中...</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5">WebSite: 
+                <Hyperlink RequestNavigate="Hyperlink_OnRequestNavigate" NavigateUri="http://hustlei.github.io/proj/epubviewer-light.html">
+                    http://hustlei.github.com</Hyperlink></TextBlock>
+            <TextBlock Grid.Row="3" Foreground="Gray">(c) Hustlei 2015. All Rights Reversed.</TextBlock>
+            <TextBlock Grid.Row="4" Foreground="Gray">hustlei, 2015 @WuHan</TextBlock>
         </Grid>
     </DockPanel>
 </ui:MordenWindow>

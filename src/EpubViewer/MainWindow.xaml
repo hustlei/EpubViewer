@@ -7,8 +7,8 @@
         DragEnter="MainWindow_OnDragEnter"
         Drop="MainWindow_OnDrop"
         LogoData="M5,15 L5,22 7,22 M12,16 L9,16 9,22 12,22 M9,19 L11,19 M15,15 L15,22"
-        Icon="img/Help.png"
-        Title="MainWindow">
+        Icon="img/epub.png"
+        Title="Epub Viewer 1.1 Lite">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -41,49 +41,65 @@
                 </MenuItem>
                 <MenuItem Header="View">
                     <MenuItem Header="Coding"/>
+                    <Separator/>
+                    <MenuItem Header="Config" Click="Config_OnClick"/>
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="About" Click="Info_Click"/>
                 </MenuItem>
             </Menu>
-            <ToolBar MinHeight="25" MaxHeight="30" Grid.Row="1" IsOverflowOpen="False" DockPanel.Dock="Top" BorderBrush="#33C8C8C8" BorderThickness="0,0,0,1" >
-                <Button Height="25" Width="25" Margin="2,0" Click="Back_Click">
-                    <Image Source="img/Back.png"/>
-                </Button>
-                <Button Height="25" Width="25" Click="Forward_Click">
-                    <Image Source="img/Forward.png"/>
-                </Button>
-                <Separator/>
-                <Button Height="25" Width="25" Margin="2,0" Click="Print_Click">
-                    <Image Source="img/Printer.png"/>
-                </Button>
-                <Separator/>
-                <Button Height="25" Width="25" Margin="2,0" Click="Encoding_Click" ToolTip="编码功能暂未实现" IsEnabled="False">
-                    <Image Source="img/code.png"/>
-                </Button>
-                <Button Height="25" Width="25" Margin="2,0" Click="ZoomIn_Click">
-                    <Image Source="img/ZoomIn.png"/>
-                </Button>
-                <Button Height="25" Width="25" Click="ZoomOut_Click">
-                    <Image Source="img/ZoomOut.png"/>
-                </Button>
-                <Separator/>
-                <Button Height="25" Width="25" Click="Find_Click">
-                    <Image Source="img/Find.png"/>
-                </Button>
-                <Separator/>
-                <Button Height="25" Width="25" Margin="2,0" Click="Sync_Click" ToolTip="同步内容到目录树">
-                    <Image Source="img/Sync.png"/>
-                </Button>
-                <Separator/>
-                <Button Height="25" Width="25" Margin="2,0" Click="NewTab_Click">
-                    <Image Source="img/newTab.png"/>
-                </Button>
-                <Separator/>
-                <Button Height="25" Width="25" HorizontalAlignment="Right" Click="Info_Click">
-                    <Image Source="img/Info.png"/>
-                </Button>
-            </ToolBar>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="28"/>
+                </Grid.ColumnDefinitions>
+                <ToolBar MinHeight="25" MaxHeight="30" IsOverflowOpen="False" BorderBrush="#33C8C8C8" BorderThickness="0,0,0,1" Background="Transparent">
+                    <Button Height="25" Width="25" Margin="2,0" Click="Open_Click">
+                        <Image Source="img/open.png"/>
+                    </Button>
+                    <Button Height="25" Width="25" Margin="2,0" Click="Close_Click">
+                        <Image Source="img/close.png"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="25" Width="25" Margin="2,0" Click="Back_Click">
+                        <Image Source="img/Back.png"/>
+                    </Button>
+                    <Button Height="25" Width="25" Click="Forward_Click">
+                        <Image Source="img/Forward.png"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="25" Width="25" Margin="2,0" Click="Print_Click">
+                        <Image Source="img/Printer.png"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="25" Width="25" Margin="2,0" Click="Encoding_Click" ToolTip="编码功能暂未实现" IsEnabled="False">
+                        <Image Source="img/code.png"/>
+                    </Button>
+                    <Button Height="25" Width="25" Margin="2,0" Click="ZoomIn_Click">
+                        <Image Source="img/ZoomIn.png"/>
+                    </Button>
+                    <Button Height="25" Width="25" Click="ZoomOut_Click">
+                        <Image Source="img/ZoomOut.png"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="25" Width="25" Click="Find_Click">
+                        <Image Source="img/Find.png"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="25" Width="25" Margin="2,0" Click="Sync_Click" ToolTip="同步内容到目录树">
+                        <Image Source="img/Sync.png"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="25" Width="25" Margin="2,0" Click="NewTab_Click" ToolTip="新标签">
+                        <Image Source="img/newTab.png"/>
+                    </Button>
+                </ToolBar>
+                <ToolBar Grid.Column="1"  OverflowMode="Never" Background="Transparent" IsOverflowOpen="False">
+                    <Button Height="25" Width="25" Click="Info_Click">
+                        <Image Source="img/Info.png"/>
+                    </Button>
+                </ToolBar>
+            </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"/>

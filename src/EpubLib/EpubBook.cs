@@ -92,23 +92,31 @@ namespace Lei.Common
         /// 打开一个Epub电子书
         /// </summary>
         /// <param name="filename">Epub文档完整路径及文件名</param>
-        public void OpenFile(string filename)
+        public bool Open(string filename)
         {
-            CloseFile();
+            Close();
             if (!this.extractEpubFile(filename))
             {
+                
                 MessageBox.Show("Cannot open file \"" + filename + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                return;
+                return false;
             }
             this.Filename = filename;
             this.Title = Path.GetFileNameWithoutExtension(filename);
             this.readEPUBFile();
+            if (TreeNode == null)
+            {
+                MessageBox.Show("\"" + filename + "\"is not a epub file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                return false;
+            }
             if (TreeNode.Nodes.Count == 0)
             {
                 MessageBox.Show("No book information in file \"" + filename + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                return false;
             }
+            return true;
         }
-        public void CloseFile()
+        public void Close()
         {
             this.Filename = "";
             this.Title = "";

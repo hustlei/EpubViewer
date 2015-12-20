@@ -17,6 +17,7 @@ using mshtml;
 using winform = System.Windows.Forms;
 using System.Windows.Threading;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace EpubViewer
 {
@@ -28,7 +29,6 @@ namespace EpubViewer
         private List<EpubBook> epubList;
         private ContentItem contentItem;
         private winform.OpenFileDialog openDlg;
-        private BackgroundWorker backWorker;
         public MainWindow()
         {
             InitializeComponent();
@@ -40,7 +40,6 @@ namespace EpubViewer
             openDlg.Multiselect = true;
             openDlg.RestoreDirectory = true;
 
-            backWorker = new BackgroundWorker();
         }
         private void Open_Click(object sender, RoutedEventArgs e)
         {
@@ -54,13 +53,84 @@ namespace EpubViewer
         }
         public void OpenFiles(string[] files)
         {
+
             waiting.Visibility = Visibility.Visible;
+            Task.Factory.StartNew(() =>
+            {
+                foreach (string file in files)
+                {
+                    if (epubList.Count == 0 || epubList.Any(a => a.Filename != file))
+                    {
+
+                        epubList.Add(new EpubBook());
+                        if (!epubList[epubList.Count - 1].Open(file))
+                        {
+                            epubList[epubList.Count-1].Close();
+                            epubList.RemoveAt(epubList.Count - 1);
+                            this.Dispatcher.Invoke((Action)delegate()
+                            {
+                                waiting.Visibility = Visibility.Collapsed;
+                            });
+                            return;
+                        }
+
+                        this.Dispatcher.Invoke((Action)delegate()
+                        {
+                            treeView.Nodes.Add(epubList[epubList.Count - 1].TreeNode);
+                        });
+                    }
+                }
+                this.Dispatcher.Invoke((Action)delegate()
+                {
+                    if (epubList[0].IsSpine)
+                        contentItem.UseDocumentTitle = true;
+                    treeView.SelectedNode = treeView.Nodes[0];
+                    treeView.SelectedNode.Expand(); 
+                    waiting.Visibility = Visibility.Collapsed;
+                });
+            });
+            /*
+            waiting.Visibility = Visibility.Visible;
+            Task ab= Task.Factory.StartNew(() =>
+            {
+                foreach (string file in files)
+                {
+                    if (epubList.Count == 0 || epubList.Any(a => a.Filename != file))
+                    {
+                        epubList.Add(new EpubBook());
+                        epubList[epubList.Count - 1].Open(file);
+                    }
+                }
+            });
+            ab.ContinueWith(
+                t =>
+                {
+                    foreach (EpubBook f in epubList)
+                    {
+                        treeView.Nodes.Add(f.TreeNode);
+                    }
+                    if (epubList[0].IsSpine)
+                        contentItem.UseDocumentTitle = true;
+                    treeView.SelectedNode = treeView.Nodes[0];
+                    treeView.SelectedNode.Expand();
+                    waiting.Visibility = Visibility.Collapsed;
+                },TaskScheduler.FromCurrentSynchronizationContext()
+                );
+            */
+            /*
+            //BackgroundWorker实现异步执行,并更改界面
+            waiting.Visibility = Visibility.Visible;
+            private BackgroundWorker backWorker;
+            backWorker = new BackgroundWorker();
             backWorker.DoWork += (object sender, DoWorkEventArgs e) =>
             {
                 foreach (string file in files)
                 {
-                    epubList.Add(new EpubBook());
-                    epubList[epubList.Count - 1].OpenFile(file);
+                    if (epubList.Count==0 || epubList.Any(a => a.Filename != file))
+                    {
+                        epubList.Add(new EpubBook());
+                        epubList[epubList.Count - 1].Open(file);
+                    }
                 }
             };
             backWorker.RunWorkerCompleted += (object seder, RunWorkerCompletedEventArgs e) =>
@@ -76,6 +146,9 @@ namespace EpubViewer
                 waiting.Visibility = Visibility.Collapsed;
             };
             backWorker.RunWorkerAsync();
+            */
+
+
             //waiting.Visibility = Visibility.Visible;
             ////模拟winform Doevent，效率低，建议改多线程
             //DispatcherFrame frame = new DispatcherFrame(true);
@@ -228,13 +301,22 @@ namespace EpubViewer
             about dlg = new about();
             dlg.Owner = this;
             dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            dlg.Topmost = true;
             dlg.ShowDialog();
+        }
+        private void Config_OnClick(object sender, RoutedEventArgs e)
+        {
+            ConfigWin w = new ConfigWin();
+            w.Owner = this;
+            w.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            w.Topmost = true;
+            w.ShowDialog();
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             foreach (EpubBook b in epubList)
-                b.CloseFile();
+                b.Close();
             epubList = new List<EpubBook>();
             treeView.Nodes.Clear();
             content.Items.Clear();
@@ -242,14 +324,14 @@ namespace EpubViewer
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             foreach (EpubBook b in epubList)
-                b.CloseFile();
+                b.Close();
             Environment.Exit(0);
         }
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             foreach (EpubBook b in epubList)
-                b.CloseFile();
+                b.Close();
         }
 
         private void searchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -296,7 +378,8 @@ namespace EpubViewer
         {
             string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
             //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            this.OpenFiles(new string[] {fileName});
+            this.OpenFiles(new string[] { fileName });
         }
+
     }
 }
