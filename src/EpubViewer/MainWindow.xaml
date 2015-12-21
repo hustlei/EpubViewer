@@ -16,7 +16,8 @@
                 <ResourceDictionary>
                     <Visibility x:Key="Color_ImageOrColor" >Visible</Visibility>
                     <Visibility x:Key="Image_ImageOrColor" >Collapsed</Visibility>
-                    <Color x:Key="Win_BackGroudColor">#3366ff</Color>
+                    <!--<Color x:Key="Win_BackGroudColor">#3366ff</Color>-->
+                    <Color x:Key="Win_BackGroudColor">#003399</Color>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -29,7 +30,7 @@
         <local:Waiting HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent"
                       x:Name="waiting" Panel.ZIndex="9999" Visibility="Collapsed"></local:Waiting>
         <DockPanel LastChildFill="True">
-            <Menu Grid.ColumnSpan="3" Background="#1ED1D1D1" DockPanel.Dock="Top">
+            <Menu Background="Transparent" DockPanel.Dock="Top">
                 <MenuItem BorderBrush="#33C8C8C8" BorderThickness="1">
                     <MenuItem.Header>
                         <TextBlock Margin="8,1" TextAlignment="Center">文  件</TextBlock>
@@ -53,7 +54,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="28"/>
                 </Grid.ColumnDefinitions>
-                <ToolBar MinHeight="25" MaxHeight="30" IsOverflowOpen="False" BorderBrush="#33C8C8C8" BorderThickness="0,0,0,1" Background="Transparent">
+                <ToolBar MinHeight="25" MaxHeight="30" IsOverflowOpen="False" BorderBrush="#33C8C8C8" BorderThickness="0,0,0,1"
+                         Background="Transparent" Style="{StaticResource MordenToolBar}">
                     <Button Height="25" Width="25" Margin="2,0" Click="Open_Click">
                         <Image Source="img/open.png"/>
                     </Button>
@@ -94,7 +96,8 @@
                         <Image Source="img/newTab.png"/>
                     </Button>
                 </ToolBar>
-                <ToolBar Grid.Column="1"  OverflowMode="Never" Background="Transparent" IsOverflowOpen="False">
+                <ToolBar Grid.Column="1"  OverflowMode="Never" Background="Transparent" IsOverflowOpen="False"
+                          Style="{StaticResource MordenToolBar}">
                     <Button Height="25" Width="25" Click="Info_Click">
                         <Image Source="img/Info.png"/>
                     </Button>

@@ -224,6 +224,8 @@ namespace EpubViewer
         }
         private void Sync_Click(object sender, RoutedEventArgs e)
         {
+            if (epubList.Count < 1)
+                return;
             string url = contentItem.browser.Url.OriginalString;
             foreach (System.Windows.Forms.TreeNode t in treeView.Nodes)
             {
@@ -281,6 +283,8 @@ namespace EpubViewer
         }
         private void NewTab_Click(object sender, RoutedEventArgs e)
         {
+            if (epubList.Count < 1)
+                return;
             contentItem = new ContentItem();
             if (epubList[0].IsSpine)
                 contentItem.UseDocumentTitle = true;
@@ -337,6 +341,7 @@ namespace EpubViewer
         private void searchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             contentItem.browser.Url = new Uri(((System.Windows.Forms.TreeNode)searchResult.SelectedItem).Name);
+            contentItem.Header = ((System.Windows.Forms.TreeNode) searchResult.SelectedItem).Text;
         }
 
         private void searchButton_Click(object sender, RoutedEventArgs e)
