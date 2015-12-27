@@ -40,10 +40,10 @@
                                                VerticalAlignment="Top"
                                                Visibility="{DynamicResource Color_ImageOrColor}">
                                         <Rectangle.Fill>
-                                            <LinearGradientBrush StartPoint="0, 0" EndPoint="0, 1" Opacity=".20">
+                                            <LinearGradientBrush StartPoint="0, 0" EndPoint="0, 1" Opacity=".2">
                                                 <GradientStop Offset="0" Color="{DynamicResource Win_BackGroudColor}" />
                                                 <GradientStop Offset=".3" Color="{DynamicResource Win_BackGroudColor}" />
-                                                <GradientStop Offset="1" Color="#33FFFFFF" />
+                                                <GradientStop Offset="1" Color="#33FFFFFF" /><!-- Color="CornflowerBlue"/>-->
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
                                     </Rectangle>

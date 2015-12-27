@@ -12,7 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 //using System.Windows.Shapes;
 using Lei.UI;
-using Lei.Common;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;

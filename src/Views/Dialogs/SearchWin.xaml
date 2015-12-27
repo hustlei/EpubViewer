@@ -28,7 +28,7 @@
         </Grid.RowDefinitions>
         <TextBlock Margin="2,0,5,0" TextAlignment="Center" VerticalAlignment="Center">查 找:</TextBlock>
         <TextBox x:Name="text" Grid.Column="1" Margin="4"></TextBox>
-        <Button Grid.Column="1" Grid.Row="1" Width="80" HorizontalAlignment="Right" Margin="5,3"
-                xml:space="preserve" Click="SearchButton_Click">搜  索</Button>
+        <Button x:Name="SearchButton" Grid.Column="1" Grid.Row="1" Width="80" Margin="5,3"
+                xml:space="preserve" HorizontalAlignment="Right">搜  索</Button>
     </Grid>
 </ui:MordenWindow>

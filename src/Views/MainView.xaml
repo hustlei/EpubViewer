@@ -1,11 +1,9 @@
-﻿<ui:MordenWindow x:Class="EpubViewer.MainWindow"
+﻿<ui:MordenWindow x:Class="EpubViewer.MainView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Lei.UI;assembly=MordenWin"
         xmlns:local="clr-namespace:EpubViewer"
-        AllowDrop="True"
-        DragEnter="MainWindow_OnDragEnter"
-        Drop="MainWindow_OnDrop"
+        AllowDrop="{Binding AllowDrop}"
         LogoData="M5,15 L5,22 7,22 M12,16 L9,16 9,22 12,22 M9,19 L11,19 M15,15 L15,22"
         Icon="img/epub.png"
         Title="Epub Viewer 1.1 Lite">
@@ -28,25 +26,25 @@
             <TextBlock Margin="35,10">asdfasdf....</TextBlock>
         </StackPanel>-->
         <local:Waiting HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent"
-                      x:Name="waiting" Panel.ZIndex="9999" Visibility="Collapsed"></local:Waiting>
+                      x:Name="Waiting" Panel.ZIndex="9999" Visibility="{Binding WaitingVisible}"></local:Waiting>
         <DockPanel LastChildFill="True">
             <Menu Background="Transparent" DockPanel.Dock="Top">
                 <MenuItem BorderBrush="#33C8C8C8" BorderThickness="1">
                     <MenuItem.Header>
                         <TextBlock Margin="8,1" TextAlignment="Center">文  件</TextBlock>
                     </MenuItem.Header>
-                    <MenuItem Header="打开" Click="Open_Click"/>
-                    <MenuItem Header="关闭" Click="Close_Click"/>
+                    <MenuItem Header="打开"/>
+                    <MenuItem Header="关闭"/>
                     <Separator/>
-                    <MenuItem Header="退出" Click="Exit_Click"/>
+                    <MenuItem Header="退出"/>
                 </MenuItem>
                 <MenuItem Header="View">
                     <MenuItem Header="Coding"/>
                     <Separator/>
-                    <MenuItem Header="Config" Click="Config_OnClick"/>
+                    <MenuItem Header="Config"/>
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="About" Click="Info_Click"/>
+                    <MenuItem Header="About"/>
                 </MenuItem>
             </Menu>
             <Grid DockPanel.Dock="Top">
@@ -56,49 +54,49 @@
                 </Grid.ColumnDefinitions>
                 <ToolBar MinHeight="25" MaxHeight="30" IsOverflowOpen="False" BorderBrush="#33C8C8C8" BorderThickness="0,0,0,1"
                          Background="Transparent" Style="{StaticResource MordenToolBar}">
-                    <Button Height="25" Width="25" Margin="2,0" Click="Open_Click">
+                    <Button x:Name="Open" Height="25" Width="25" Margin="2,0">
                         <Image Source="img/open.png"/>
                     </Button>
-                    <Button Height="25" Width="25" Margin="2,0" Click="Close_Click">
+                    <Button x:Name="Close" Height="25" Width="25" Margin="2,0">
                         <Image Source="img/close.png"/>
                     </Button>
                     <Separator/>
-                    <Button Height="25" Width="25" Margin="2,0" Click="Back_Click">
+                    <Button x:Name="Back" Height="25" Width="25" Margin="2,0">
                         <Image Source="img/Back.png"/>
                     </Button>
-                    <Button Height="25" Width="25" Click="Forward_Click">
+                    <Button Height="25" Width="25" x:Name="Forward">
                         <Image Source="img/Forward.png"/>
                     </Button>
                     <Separator/>
-                    <Button Height="25" Width="25" Margin="2,0" Click="Print_Click">
+                    <Button Height="25" Width="25" Margin="2,0" x:Name="Print">
                         <Image Source="img/Printer.png"/>
                     </Button>
                     <Separator/>
-                    <Button Height="25" Width="25" Margin="2,0" Click="Encoding_Click" ToolTip="编码功能暂未实现" IsEnabled="False">
+                    <Button Height="25" Width="25" Margin="2,0" x:Name="Encoding" ToolTip="编码功能暂未实现" IsEnabled="False">
                         <Image Source="img/code.png"/>
                     </Button>
-                    <Button Height="25" Width="25" Margin="2,0" Click="ZoomIn_Click">
+                    <Button Height="25" Width="25" Margin="2,0" x:Name="ZoomIn">
                         <Image Source="img/ZoomIn.png"/>
                     </Button>
-                    <Button Height="25" Width="25" Click="ZoomOut_Click">
+                    <Button Height="25" Width="25" x:Name="ZoomOut">
                         <Image Source="img/ZoomOut.png"/>
                     </Button>
                     <Separator/>
-                    <Button Height="25" Width="25" Click="Find_Click">
+                    <Button Height="25" Width="25" x:Name="Find">
                         <Image Source="img/Find.png"/>
                     </Button>
                     <Separator/>
-                    <Button Height="25" Width="25" Margin="2,0" Click="Sync_Click" ToolTip="同步内容到目录树">
+                    <Button Height="25" Width="25" Margin="2,0" x:Name="SyncToc" ToolTip="同步内容到目录树">
                         <Image Source="img/Sync.png"/>
                     </Button>
                     <Separator/>
-                    <Button Height="25" Width="25" Margin="2,0" Click="NewTab_Click" ToolTip="新标签">
+                    <Button Height="25" Width="25" Margin="2,0" x:Name="NewTab" ToolTip="新标签">
                         <Image Source="img/newTab.png"/>
                     </Button>
                 </ToolBar>
                 <ToolBar Grid.Column="1"  OverflowMode="Never" Background="Transparent" IsOverflowOpen="False"
                           Style="{StaticResource MordenToolBar}">
-                    <Button Height="25" Width="25" Click="Info_Click">
+                    <Button Height="25" Width="25" x:Name="About">
                         <Image Source="img/Info.png"/>
                     </Button>
                 </ToolBar>
@@ -113,12 +111,7 @@
                 <TabControl Grid.Column="0" TabStripPlacement="Bottom" ToolBarTray.IsLocked="True" Margin="0,0,0,2"
                         Background="Transparent" ClipToBounds="True">
                     <TabItem Header="目录" MinWidth="60" BorderBrush="LightGray" BorderThickness="1,0,1,1">
-                        <WindowsFormsHost>
-                            <TreeView x:Name="treeView" BorderStyle="None"
-                                  xmlns="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-                                  AfterSelect="afterSelect" BeforeCollapse="collapse" BeforeExpand="expand"
-                                  />
-                        </WindowsFormsHost>
+                            <TreeView x:Name="TocTreeView"/>
                     </TabItem>
                     <TabItem Header="搜索" MinWidth="60" BorderBrush="LightGray" BorderThickness="1,0,1,1">
                         <DockPanel LastChildFill="True">
@@ -127,12 +120,11 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="searchText" Grid.Column="0" Margin="2,1" KeyDown="searchText_KeyDown"/>
-                                <Button x:Name="searchButton" Grid.Column="1" Margin="2,1" Padding="8,1"
-                                    xml:space="preserve" Click="searchButton_Click">搜 索</Button>
+                                <TextBox x:Name="SearchText" Grid.Column="0" Margin="2,1"/>
+                                <Button x:Name="SearchButton" Grid.Column="1" Margin="2,1" Padding="8,1"
+                                    xml:space="preserve">搜 索</Button>
                             </Grid>
-                            <ListView x:Name="searchResult" SelectionChanged="searchResult_SelectionChanged"
-                                   BorderThickness="0" DisplayMemberPath="{Binding Text}">
+                            <ListView x:Name="SearchResult" BorderThickness="0" DisplayMemberPath="{Binding Text}">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Text}"></TextBlock>
@@ -152,8 +144,7 @@
                 <!--splitter-->
                 <GridSplitter Name="LeftSplitter" Grid.Column="1" HorizontalAlignment="Stretch" Background="#CCE1E1E1" />
                 <!--content-->
-                <TabControl x:Name="content" Grid.Column="2" ClipToBounds="True"
-                        SelectionChanged="contentItemChanged" Background="Transparent">
+                <TabControl x:Name="Content" Grid.Column="2" ClipToBounds="True"  Background="Transparent">
                     <!--<local:ContentItem/>-->
                 </TabControl>
             </Grid>

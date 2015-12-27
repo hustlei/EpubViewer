@@ -20,8 +20,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\win\bind\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\win\objd\$(ProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>..\..\win\bind\views\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\win\objd\MordenWin</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,16 +29,16 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\win\bin\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\win\objd\$(ProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>..\..\win\bin\views\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\win\objd\MordenWin</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Windows.Shell, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\libraries\Microsoft.Windows.Shell.dll</HintPath>
+    <Reference Include="Microsoft.Windows.Shell">
+      <HintPath>..\..\libraries\views\Microsoft.Windows.Shell.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -54,9 +54,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.Toolkit, Version=2.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\libraries\Xceed.Wpf.Toolkit.dll</HintPath>
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>..\..\libraries\views\Xceed.Wpf.Toolkit.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

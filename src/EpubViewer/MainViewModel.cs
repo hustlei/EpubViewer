@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -11,12 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Lei.UI;
-using Lei.Common;
-using mshtml;
+
+
+using Caliburn.Micro;
 using winform = System.Windows.Forms;
-using System.Windows.Threading;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace EpubViewer
@@ -24,71 +23,67 @@ namespace EpubViewer
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : MordenWindow
+    [Export(typeof(IShell))]
+    public class MainViewModel : PropertyChangedBase, IShell
     {
-        private List<EpubBook> epubList;
-        private ContentItem contentItem;
-        private winform.OpenFileDialog openDlg;
-        public MainWindow()
-        {
-            InitializeComponent();
-            treeView.ImageList = EpubBook.ImageList;
-            epubList = new List<EpubBook>();
+        private readonly EpubService _epubService;
+        private readonly winform.OpenFileDialog _openDlg;
 
-            openDlg = new winform.OpenFileDialog();
-            openDlg.Filter = "EPUB Files(*.epub)|*.epub";
-            openDlg.Multiselect = true;
-            openDlg.RestoreDirectory = true;
-
+        private Visibility _waitingVisible;
+        
+        public Visibility WaitingVisible {
+            get { return _waitingVisible; }
+            set { _waitingVisible=value;NotifyOfPropertyChange(()=>WaitingVisible); }
         }
-        private void Open_Click(object sender, RoutedEventArgs e)
+        public bool AllowDrop { get; set; }
+        public MainViewModel()
         {
-            if (openDlg.ShowDialog() == winform.DialogResult.OK)
+            _epubService= new EpubService();
+            _openDlg = new winform.OpenFileDialog
             {
-                if (openDlg.FileNames.Length > 0 && openDlg.FileNames[0].Length > 0)
+                Filter = "EPUB Files(*.epub)|*.epub|EPUB Files(*.epub3)|*.epub3",
+                Multiselect = true,
+                RestoreDirectory = true
+            };
+            WaitingVisible=Visibility.Collapsed;
+            AllowDrop = false;
+        }
+        public void Open()
+        {
+            if (_openDlg.ShowDialog() == winform.DialogResult.OK)
+            {
+                WaitingVisible = Visibility.Visible;
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    OpenFiles(openDlg.FileNames);
-                }
+                    if (_openDlg.FileNames.Length > 0 && _openDlg.FileNames[0].Length > 0)
+                    {
+                        _epubService.OpenFiles(_openDlg.FileNames);
+                    }
+                    WaitingVisible = Visibility.Collapsed;//ok可行
+                });
+                //task.ContinueWith(t =>
+                //    {
+                //        //if (_epubService.EpubList[0].IsSpine)
+                //        //    contentItem.UseDocumentTitle = true;
+                //        //treeView.SelectedNode = treeView.Nodes[0];
+                //        //treeView.SelectedNode.Expand();
+                //        WaitingVisible = Visibility.Collapsed;
+                //    }, TaskScheduler.FromCurrentSynchronizationContext());
             }
         }
+
+        public void Close()
+        {
+            _epubService.CloseFiles();
+        }
+
+        public void Drop(object e)
+        {
+            
+        }
+        /* 多线程
         public void OpenFiles(string[] files)
         {
-
-            waiting.Visibility = Visibility.Visible;
-            Task.Factory.StartNew(() =>
-            {
-                foreach (string file in files)
-                {
-                    if (epubList.Count == 0 || epubList.Any(a => a.Filename != file))
-                    {
-
-                        epubList.Add(new EpubBook());
-                        if (!epubList[epubList.Count - 1].Open(file))
-                        {
-                            epubList[epubList.Count-1].Close();
-                            epubList.RemoveAt(epubList.Count - 1);
-                            this.Dispatcher.Invoke((Action)delegate()
-                            {
-                                waiting.Visibility = Visibility.Collapsed;
-                            });
-                            return;
-                        }
-
-                        this.Dispatcher.Invoke((Action)delegate()
-                        {
-                            treeView.Nodes.Add(epubList[epubList.Count - 1].TreeNode);
-                        });
-                    }
-                }
-                this.Dispatcher.Invoke((Action)delegate()
-                {
-                    if (epubList[0].IsSpine)
-                        contentItem.UseDocumentTitle = true;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    treeView.SelectedNode.Expand(); 
-                    waiting.Visibility = Visibility.Collapsed;
-                });
-            });
             /*
             waiting.Visibility = Visibility.Visible;
             Task ab= Task.Factory.StartNew(() =>
@@ -116,8 +111,8 @@ namespace EpubViewer
                     waiting.Visibility = Visibility.Collapsed;
                 },TaskScheduler.FromCurrentSynchronizationContext()
                 );
-            */
-            /*
+            
+            
             //BackgroundWorker实现异步执行,并更改界面
             waiting.Visibility = Visibility.Visible;
             private BackgroundWorker backWorker;
@@ -146,7 +141,7 @@ namespace EpubViewer
                 waiting.Visibility = Visibility.Collapsed;
             };
             backWorker.RunWorkerAsync();
-            */
+            
 
 
             //waiting.Visibility = Visibility.Visible;
@@ -159,59 +154,60 @@ namespace EpubViewer
             //}, frame);
             //Dispatcher.PushFrame(frame);
         }
+    */
+        //#region 左边栏treeview相关函数
+        //private void collapse(object sender, winform.TreeViewCancelEventArgs e)
+        //{
+        //    e.Node.ImageIndex = 0;
+        //    e.Node.SelectedImageIndex = 0;
+        //}
+        //private void expand(object sender, winform.TreeViewCancelEventArgs e)
+        //{
+        //    e.Node.ImageIndex = 1;
+        //    e.Node.SelectedImageIndex = 1;
+        //}
+        //private void afterSelect(object sender, winform.TreeViewEventArgs e)
+        //{
+        //    if (contentItem == null)
+        //        NewTab_Click(null, null);
+        //    try
+        //    {
+        //        string url = "";
+        //        string text = "";
+        //        if (e != null)
+        //        {
+        //            url = e.Node.Name;
+        //            text = e.Node.Text;
+        //        }
+        //        else
+        //        {
+        //            if (treeView.SelectedNode != null)
+        //            {
+        //                url = treeView.SelectedNode.Name;
+        //                text = treeView.SelectedNode.Text;
+        //            }
+        //        }
+        //        if (url != "")
+        //        {
+        //            //contentItem.browser.Url = new Uri(Uri.EscapeUriString(url));
+        //            //暂时不知道为什么不支持中文锚点
+        //            Uri xx = new Uri(url);
+        //            contentItem.browser.Navigate(xx);
+        //            //    MessageBox.Show(xx + " " + contentItem.browser.Url.ToString());
+        //            contentItem.Header = text;
+        //        }
+        //    }
+        //    catch { }
+        //}
+        //# endregion
 
-        #region 左边栏treeview相关函数
-        private void collapse(object sender, winform.TreeViewCancelEventArgs e)
-        {
-            e.Node.ImageIndex = 0;
-            e.Node.SelectedImageIndex = 0;
-        }
-        private void expand(object sender, winform.TreeViewCancelEventArgs e)
-        {
-            e.Node.ImageIndex = 1;
-            e.Node.SelectedImageIndex = 1;
-        }
-        private void afterSelect(object sender, winform.TreeViewEventArgs e)
-        {
-            if (contentItem == null)
-                NewTab_Click(null, null);
-            try
-            {
-                string url = "";
-                string text = "";
-                if (e != null)
-                {
-                    url = e.Node.Name;
-                    text = e.Node.Text;
-                }
-                else
-                {
-                    if (treeView.SelectedNode != null)
-                    {
-                        url = treeView.SelectedNode.Name;
-                        text = treeView.SelectedNode.Text;
-                    }
-                }
-                if (url != "")
-                {
-                    //contentItem.browser.Url = new Uri(Uri.EscapeUriString(url));
-                    //暂时不知道为什么不支持中文锚点
-                    Uri xx = new Uri(url);
-                    contentItem.browser.Navigate(xx);
-                    //    MessageBox.Show(xx + " " + contentItem.browser.Url.ToString());
-                    contentItem.Header = text;
-                }
-            }
-            catch { }
-        }
-        # endregion
-
-        #region 内容主题tabcontrol相关函数
-        private void contentItemChanged(object sender, SelectionChangedEventArgs e)
-        {
-            contentItem = (ContentItem)content.SelectedItem;
-        }
-        #endregion
+        //#region 内容主题tabcontrol相关函数
+        //private void contentItemChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    contentItem = (ContentItem)content.SelectedItem;
+        //}
+        //#endregion
+        /*
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             if (contentItem != null && contentItem.browser.CanGoBack)
@@ -224,7 +220,7 @@ namespace EpubViewer
         }
         private void Sync_Click(object sender, RoutedEventArgs e)
         {
-            if (epubList.Count < 1)
+            if (_epubList.Count < 1)
                 return;
             string url = contentItem.browser.Url.OriginalString;
             foreach (System.Windows.Forms.TreeNode t in treeView.Nodes)
@@ -283,10 +279,10 @@ namespace EpubViewer
         }
         private void NewTab_Click(object sender, RoutedEventArgs e)
         {
-            if (epubList.Count < 1)
+            if (_epubList.Count < 1)
                 return;
             contentItem = new ContentItem();
-            if (epubList[0].IsSpine)
+            if (_epubList[0].IsSpine)
                 contentItem.UseDocumentTitle = true;
             content.Items.Add(contentItem);
             content.SelectedItem = contentItem;
@@ -319,29 +315,29 @@ namespace EpubViewer
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            foreach (EpubBook b in epubList)
+            foreach (EpubBook b in _epubList)
                 b.Close();
-            epubList = new List<EpubBook>();
+            _epubList = new List<EpubBook>();
             treeView.Nodes.Clear();
             content.Items.Clear();
         }
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
-            foreach (EpubBook b in epubList)
+            foreach (EpubBook b in _epubList)
                 b.Close();
             Environment.Exit(0);
         }
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            foreach (EpubBook b in epubList)
+            foreach (EpubBook b in _epubList)
                 b.Close();
         }
 
         private void searchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             contentItem.browser.Url = new Uri(((System.Windows.Forms.TreeNode)searchResult.SelectedItem).Name);
-            contentItem.Header = ((System.Windows.Forms.TreeNode) searchResult.SelectedItem).Text;
+            contentItem.Header = ((System.Windows.Forms.TreeNode)searchResult.SelectedItem).Text;
         }
 
         private void searchButton_Click(object sender, RoutedEventArgs e)
@@ -384,7 +380,6 @@ namespace EpubViewer
             string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
             //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
             this.OpenFiles(new string[] { fileName });
-        }
-
+        }*/
     }
 }

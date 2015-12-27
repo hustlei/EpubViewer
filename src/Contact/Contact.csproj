@@ -4,21 +4,20 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6111C6D5-FD21-48DC-89CB-7425433D67B3}</ProjectGuid>
+    <ProjectGuid>{5268E4E2-3D5E-4461-943A-25A7E6CE4E94}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lei.Common</RootNamespace>
-    <AssemblyName>Epub</AssemblyName>
+    <RootNamespace>Contact</RootNamespace>
+    <AssemblyName>Contact</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\win\bind\bin\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\win\objd\EpubLib</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\win\objd\Contact</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,21 +26,14 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\win\bin\bin\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\win\obj\EpubLib</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\win\obj\Contact</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\libraries\Ionic.Zip.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,43 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EpubBook.cs" />
-    <Compile Include="EpubBook.Search.cs" />
-    <Compile Include="EpubBook.private.cs" />
+    <Compile Include="IShell.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ChangeLog.md" />
-    <None Include="dox\Intro.md" />
-    <None Include="ReadMe.md" />
-    <None Include="Resources\Book_angle.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Book_open.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Page.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PageUnselect.png" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>IncBuildNo.exe "$(PROJECTDIR)\Properties\AssemblyInfo.cs" "\[assembly: AssemblyVersion\(\"\d+\.\d+\.\d+\.(\d+)" 1
-</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

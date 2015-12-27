@@ -144,7 +144,7 @@ SectionEnd
 Section "关联epub文件" SEC1
 	SectionIn 1 RO
 	!insertmacro Assoc "epub,epub3" "epub" "epub电子书文件" "$INSTDIR\${Project}.exe" \
-											 "$INSTDIR\rc4net.dll,1"
+											 "$INSTDIR\bin\rc4net.dll,1"
 		System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
 		Sleep 500
 SectionEnd
@@ -164,7 +164,7 @@ Section -Post
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\${Project}.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\rc4net.dll"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\bin\rc4net.dll"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
