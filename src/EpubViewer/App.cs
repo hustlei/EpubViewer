@@ -1,38 +1,49 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Configuration;
-//using System.Data;
-//using System.Linq;
-//using System.Windows;
-
+﻿#if NOXAPPXAML
 using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
-using System.Windows.Navigation;
 using System.Windows.Threading;
 
 namespace EpubViewer
 {
-    /// <summary>
-    /// App.xaml 的交互逻辑
-    /// </summary>
-    public partial class App : Application
+    public class App : Application
     {
-        static App()
-        {
-            conf(@"profiles\init.conf");
-        }
-        public App()
+        private AppBootstrapper b;
+        public App():base()
         {
             try
             {
-                var booter = new AppBootstrapper();
+                //ResourceDictionary a=new ResourceDictionary();
+                //b = new AppBootstrapper();
+                //a.Add("",b);
+                //this.Resources.MergedDictionaries.Add(a);
+                var booter=new AppBootstrapper();
                 booter.Initialize();
                 this.DispatcherUnhandledException += App_OnDispatcherUnhandledException;
             }
             catch (Exception e)
             {
-                MessageBox.Show("BootStrapper: " + e.Message);
+                MessageBox.Show("BootStrapper: "+e.Message);
+            }
+        }
+
+        //[System.STAThreadAttribute()]
+        [STAThread]
+        static void Main()
+        {
+            conf(@"profiles\init.conf");
+            try
+            {
+                var app = new App();
+                app.Run();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Source.ToString() + ": " + e.Message, "in Main");
             }
         }
 
@@ -51,3 +62,4 @@ namespace EpubViewer
         }
     }
 }
+#endif

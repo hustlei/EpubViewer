@@ -1,13 +1,4 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Lileilei
- * 日期: 2015-12-4
- * 时间: 9:41
- * 
- * 要改变这种模板请点击 工具|选项|代码编写|编辑标准头文件
- * Main项目必须引用Interactivity，cm，cm.platform
- */
-using System;
+﻿using System;
 using Caliburn.Micro;
 using System.Collections.Generic;
 using System.Reflection;
