@@ -21,14 +21,14 @@ namespace EpubViewer
         static App()
         {
             conf(@"profiles\init.conf");
+            AppDomain.CurrentDomain.UnhandledException += 
+            	(sender, args) =>MessageBox.Show(((Exception)args.ExceptionObject).Message, "Exception Unhandled");
         }
         public App()
         {
             try
             {
                 var booter = new AppBootstrapper();
-                booter.Initialize();
-                this.DispatcherUnhandledException += App_OnDispatcherUnhandledException;
             }
             catch (Exception e)
             {
@@ -39,15 +39,11 @@ namespace EpubViewer
         // ReSharper disable once InconsistentNaming
         private static void conf(string p)
         {
-            AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", p);
-            var m = typeof(AppDomainSetup).GetMethod("UpdateContextProperty", BindingFlags.NonPublic | BindingFlags.Static);
+            //AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", p);
             var funsion = typeof(AppDomain).GetMethod("GetFusionContext", BindingFlags.NonPublic | BindingFlags.Instance);
-            m.Invoke(null, new[] { funsion.Invoke(AppDomain.CurrentDomain, null), "APP_CONFIG_FILE", p });
-        }
-
-        private void App_OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            MessageBox.Show(e.Exception.Message, "app.xaml unhandled");
+            var fusionContext = funsion.Invoke(AppDomain.CurrentDomain, null);
+            var m = typeof(AppDomainSetup).GetMethod("UpdateContextProperty", BindingFlags.NonPublic | BindingFlags.Static);
+            m.Invoke(null, new[] { fusionContext, "APP_CONFIG_FILE", p });
         }
     }
 }
