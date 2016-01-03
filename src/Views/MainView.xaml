@@ -14,8 +14,8 @@
                 <ResourceDictionary>
                     <Visibility x:Key="Color_ImageOrColor" >Visible</Visibility>
                     <Visibility x:Key="Image_ImageOrColor" >Collapsed</Visibility>
-                    <!--<Color x:Key="Win_BackGroudColor">#3366ff</Color>-->
-                    <Color x:Key="Win_BackGroudColor">#003399</Color>
+                    <Color x:Key="Win_BackGroudColor">#3366ff</Color>
+                    <!--<Color x:Key="Win_BackGroudColor">#003399</Color>-->
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -39,9 +39,9 @@
                     <MenuItem Header="退出"/>
                 </MenuItem>
                 <MenuItem Header="View">
-                    <MenuItem Header="Coding"/>
+                    <MenuItem x:Name="Coding" Header="Coding"/>
                     <Separator/>
-                    <MenuItem Header="Config"/>
+                    <MenuItem x:Name="Config" Header="Config"/>
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="About"/>
@@ -111,7 +111,7 @@
                 <TabControl Grid.Column="0" TabStripPlacement="Bottom" ToolBarTray.IsLocked="True" Margin="0,0,0,2"
                         Background="Transparent" ClipToBounds="True">
                     <TabItem Header="目录" MinWidth="60" BorderBrush="LightGray" BorderThickness="1,0,1,1">
-                            <TreeView x:Name="TocTreeView"/>
+                        <TreeView x:Name="TocTreeView"/>
                     </TabItem>
                     <TabItem Header="搜索" MinWidth="60" BorderBrush="LightGray" BorderThickness="1,0,1,1">
                         <DockPanel LastChildFill="True">

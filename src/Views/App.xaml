@@ -3,6 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainView.xaml">
     <Application.Resources>
-        <ResourceDictionary Source="/MordenWin;component/Themes/Generic.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/MordenWin;component/Themes/Generic.xaml" />
+                <ResourceDictionary>
+                    <Visibility x:Key="Color_ImageOrColor" >Visible</Visibility>
+                    <Visibility x:Key="Image_ImageOrColor" >Collapsed</Visibility>
+                    <Color x:Key="Win_BackGroudColor">#3366ff</Color>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

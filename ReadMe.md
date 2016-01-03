@@ -5,7 +5,9 @@
 
 # 编译
 
-编译前请把libraries目录下4个dll文件复制到目标目录(bin或bind)的common目录下
++ 编译前请把libraries目录下4个dll文件复制到目标目录(bin或bind)的common目录下。
++ 如果用Visual Studio调试，请把App.config.debug改名为App.config，用sharpdevelop调试则不需要，发布软件也不需要。
+
 
 # License
 

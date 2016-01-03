@@ -23,9 +23,10 @@ namespace EpubViewer
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    [Export(typeof(IShell))]
-    public class MainViewModel : PropertyChangedBase, IShell
+    [Export(typeof (MainViewModel))]
+    public class MainViewModel : Screen
     {
+        private readonly IWindowManager _windowManager;
         private readonly EpubService _epubService;
         private readonly winform.OpenFileDialog _openDlg;
 
@@ -36,8 +37,10 @@ namespace EpubViewer
             set { _waitingVisible=value;NotifyOfPropertyChange(()=>WaitingVisible); }
         }
         public bool AllowDrop { get; set; }
-        public MainViewModel()
+        [ImportingConstructor]
+        public MainViewModel(IWindowManager windowManager)
         {
+            _windowManager = windowManager;
             _epubService= new EpubService();
             _openDlg = new winform.OpenFileDialog
             {
@@ -53,7 +56,7 @@ namespace EpubViewer
             if (_openDlg.ShowDialog() == winform.DialogResult.OK)
             {
                 WaitingVisible = Visibility.Visible;
-                Task task = Task.Factory.StartNew(() =>
+                var task = Task.Factory.StartNew(() =>
                 {
                     if (_openDlg.FileNames.Length > 0 && _openDlg.FileNames[0].Length > 0)
                     {
@@ -303,16 +306,13 @@ namespace EpubViewer
             dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             dlg.Topmost = true;
             dlg.ShowDialog();
-        }
-        private void Config_OnClick(object sender, RoutedEventArgs e)
+        }*/
+        public void Config()
         {
-            ConfigWin w = new ConfigWin();
-            w.Owner = this;
-            w.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            w.Topmost = true;
-            w.ShowDialog();
+            var settings = new Dictionary<string, object> {{"Topmost", true}, {"Owner", GetView()}};//Topmost，Owner不是依赖属性不能绑定,只能在这里设置
+            _windowManager.ShowDialog(new ConfigViewModel(), null, settings);
         }
-
+        /*
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             foreach (EpubBook b in _epubList)

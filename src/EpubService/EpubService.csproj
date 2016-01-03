@@ -97,7 +97,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="app.config" />
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

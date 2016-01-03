@@ -115,11 +115,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="Assoc.cs" />
+    <Compile Include="ConfigViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="App.config0">
+    <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="profiles\init.conf">
@@ -128,11 +130,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Contact\Contact.csproj">
-      <Project>{5268e4e2-3d5e-4461-943a-25a7e6ce4e94}</Project>
-      <Name>Contact</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\EpubService\EpubService.csproj">
       <Project>{59ae3aa9-9c24-4e5e-8142-0a84741e940e}</Project>
       <Name>EpubService</Name>
@@ -169,6 +166,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="epub.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="epubviewer.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

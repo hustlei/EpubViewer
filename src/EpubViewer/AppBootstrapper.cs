@@ -47,8 +47,9 @@ namespace EpubViewer
             //lst.Add(Assembly.LoadFrom(System.Environment.CurrentDirectory+@"\view\Presenter.dll"));
             return lst;
         }
-        protected override void OnStartup(object sender, System.Windows.StartupEventArgs e)
+        protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            DisplayRootViewFor<MainViewModel>();
             //MainWindow win = new MainWindow();
             //if (e.Args.Length > 0)
             //{
@@ -56,7 +57,6 @@ namespace EpubViewer
             //    win.OpenFiles(files);
             //}
             //win.Show();
-            DisplayRootViewFor<IShell>();
         }
         protected override object GetInstance(Type serviceType, string key)
         {

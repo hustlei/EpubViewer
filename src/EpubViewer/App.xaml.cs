@@ -21,8 +21,12 @@ namespace EpubViewer
         static App()
         {
             conf(@"profiles\init.conf");
-            AppDomain.CurrentDomain.UnhandledException += 
-            	(sender, args) =>MessageBox.Show(((Exception)args.ExceptionObject).Message, "Exception Unhandled");
+            AppDomain.CurrentDomain.UnhandledException +=
+                (sender, args) =>
+                {
+                    MessageBox.Show(((Exception) args.ExceptionObject).Message, "Exception Unhandled");
+                    Environment.Exit(1);
+                };
         }
         public App()
         {

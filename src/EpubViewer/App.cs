@@ -1,4 +1,7 @@
-﻿#if NOXAPPXAML
+﻿//本文件和App.xaml具有相同的效果，是App.xaml的纯代码实现，更加灵活，当然需要知识更多。
+//默认用app.xaml
+#define XAMLAPP
+#if !XAMLAPP
 using System;
 using System.Collections.Generic;
 using System.Configuration;
