@@ -16,7 +16,7 @@ namespace EpubViewer
     {
         private readonly List<EpubBook> _epubList;
 
-        public TreeNode TreeNode;
+        public List<TreeNode> TreeNode;
         public static List<BitmapImage> Images { get;set; }
         public List<EpubBook> EpubList { get { return _epubList; } }
 
@@ -31,7 +31,7 @@ namespace EpubViewer
         public EpubService()
         {
             _epubList = new List<EpubBook>();
-            TreeNode=new TreeNode();
+            TreeNode=new List<TreeNode>();
         }
 
         public void OpenFiles(string[] files)
@@ -47,7 +47,7 @@ namespace EpubViewer
                         _epubList.RemoveAt(_epubList.Count - 1);
                         return;
                     }
-                    TreeNode.Nodes.Add(_epubList[_epubList.Count - 1].TreeNode);
+                    TreeNode.Add(_epubList[_epubList.Count - 1].TreeNode);
                 }
             }
         }
@@ -58,7 +58,7 @@ namespace EpubViewer
             {
                 epub.Close();
             }
-            TreeNode.Nodes.Clear();
+            TreeNode.Clear();
         }
 
         ~EpubService()

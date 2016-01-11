@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
@@ -30,10 +31,10 @@ namespace EpubViewer
         private readonly EpubService _epubService;
         private readonly winform.OpenFileDialog _openDlg;
 
-        private winform.TreeNode _nodes; 
-        public winform.TreeNode Nodes {
-            get { return _nodes; }
-            set { _nodes = value;NotifyOfPropertyChange("Nodes"); }
+        private List<winform.TreeNode> _nod; 
+        public List<winform.TreeNode> Nod {
+            get { return _nod; }
+            set { _nod = value;NotifyOfPropertyChange("Nod"); }
         }
 
         private Visibility _waitingVisible;
@@ -66,18 +67,16 @@ namespace EpubViewer
                     if (_openDlg.FileNames.Length > 0 && _openDlg.FileNames[0].Length > 0)
                     {
                         _epubService.OpenFiles(_openDlg.FileNames);
-                        Nodes = _epubService.TreeNode;
+                        Nod=_epubService.TreeNode;
                         if(ActiveItem==null)
                             NewTab();
                         if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
                             ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
-
                     }
-                    NotifyOfPropertyChange("Nodes");
                     WaitingVisible = Visibility.Collapsed;//ok可行
                 });
 
-                //        //treeView.SelectedNode = treeView.Nodes[0];
+                //        //treeView.SelectedNode = treeView.Nod[0];
                 //        //treeView.SelectedNode.Expand();
             }
         }
@@ -155,10 +154,10 @@ namespace EpubViewer
         //}
         #endregion
 
-        public async void NewTab()
+        public void NewTab()
         {
             var item = new ContentTabItemViewModel();
-            await ActivateItem(item);
+            ActivateItem(item);
             //item.DisplayName = item.WebBrowser.Title;
 
             //if (_epubList.Count < 1)
@@ -190,7 +189,7 @@ namespace EpubViewer
             if (_epubList.Count < 1)
                 return;
             string url = contentItem.browser.Url.OriginalString;
-            foreach (System.Windows.Forms.TreeNode t in treeView.Nodes)
+            foreach (System.Windows.Forms.TreeNode t in treeView.Nod)
             {
                 System.Windows.Forms.TreeNode node = EpubBook.SearchNodeName(t, url);
                 if (node != null)
@@ -272,7 +271,7 @@ namespace EpubViewer
             foreach (EpubBook b in _epubList)
                 b.Close();
             _epubList = new List<EpubBook>();
-            treeView.Nodes.Clear();
+            treeView.Nod.Clear();
             content.Items.Clear();
         }
         private void Exit_Click(object sender, RoutedEventArgs e)
@@ -302,7 +301,7 @@ namespace EpubViewer
                 return;
             }
             List<System.Windows.Forms.TreeNode> rst = new List<System.Windows.Forms.TreeNode>();
-            foreach (System.Windows.Forms.TreeNode t in treeView.Nodes)
+            foreach (System.Windows.Forms.TreeNode t in treeView.Nod)
             {
                 EpubBook.SearchTopic(t, topic, rst);
             }
