@@ -14,6 +14,9 @@ EpubLib内仅包含一个类EpubBook，可以读取一个Epub文件，EpubBook�
     - CloseFile():关闭文档，清空所有属性，删除缓存文档，在程序关闭前必须调用该函数，否则会占用系统临时目录空间。
 + 属性:
     - TreeNode TreeNode:Epub目录树
+		* name属性存储url
+		* text属性存储章节/文章名称
+        * ImageIndex存储图标序号
     - static ImageList ImageList;按顺序存储文件夹图标、打开的文件夹图标、文件图标
     - bool IsSpine;是否读取顺序阅读目录，默认为否
     - string Filename：文件名称

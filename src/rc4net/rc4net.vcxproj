@@ -42,12 +42,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\win\bind\</OutDir>
-    <IntDir>..\..\win\objd\$(ProjectName)</IntDir>
+    <IntDir>..\..\win\objd\$(MSBuildProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\win\bin\</OutDir>
-    <IntDir>..\..\win\obj\$(ProjectName)</IntDir>
+    <IntDir>..\..\win\obj\$(MSBuildProjectName)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

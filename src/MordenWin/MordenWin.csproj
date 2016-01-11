@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\win\bind\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\win\objd\$(ProjectName)</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\win\objd\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,7 +30,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\win\bin\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\win\objd\$(ProjectName)</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\win\objd\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
