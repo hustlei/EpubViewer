@@ -10,7 +10,7 @@ namespace Lei.UI
 {
     public partial class MordenTabItemsDict
     {
-        public void Button_Click(object sender, RoutedEventArgs e)
+        public virtual void ItemClose(object sender, RoutedEventArgs e)
         {
             Button bt = (Button)sender;
             //FrameworkElement c = (FrameworkElement)((FrameworkElement)bt.Parent).Parent;

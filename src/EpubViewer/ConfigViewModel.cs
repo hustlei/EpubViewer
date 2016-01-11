@@ -14,12 +14,12 @@ namespace EpubViewer
         public bool EpubChecked
         {
             get { return _epubChecked; }
-            set { _epubChecked = value; NotifyOfPropertyChange(() => EpubChecked); }
+            set { _epubChecked = value; NotifyOfPropertyChange("EpubChecked"); }
         }
         public bool Epub3Checked
         {
             get { return _epub3Checked; }
-            set { _epub3Checked = value; NotifyOfPropertyChange(() => Epub3Checked); }
+            set { _epub3Checked = value; NotifyOfPropertyChange("Epub3Checked"); }
         }
         internal ConfigViewModel()
         {
@@ -36,7 +36,6 @@ namespace EpubViewer
         public void OK()
         {
             //string progFilename = Directory.GetCurrentDirectory() + @"\EpubViwer.exe";
-
             string progFilename = Environment.CurrentDirectory + @"\EpubViewer.exe";
             string type = "epub";
             string typeDescription = "epub电子书";

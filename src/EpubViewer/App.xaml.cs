@@ -21,10 +21,11 @@ namespace EpubViewer
         static App()
         {
             conf(@"profiles\init.conf");
+            addPath(Environment.CurrentDirectory+"\\views\\cefx86");
             AppDomain.CurrentDomain.UnhandledException +=
                 (sender, args) =>
                 {
-                    MessageBox.Show(((Exception) args.ExceptionObject).Message, "Exception Unhandled");
+                    MessageBox.Show(((Exception) args.ExceptionObject).Message+"\n"+sender.ToString(), "Exception Unhandled");
                     Environment.Exit(1);
                 };
         }
@@ -48,6 +49,11 @@ namespace EpubViewer
             var fusionContext = funsion.Invoke(AppDomain.CurrentDomain, null);
             var m = typeof(AppDomainSetup).GetMethod("UpdateContextProperty", BindingFlags.NonPublic | BindingFlags.Static);
             m.Invoke(null, new[] { fusionContext, "APP_CONFIG_FILE", p });
+        }
+
+        private static void addPath(string p)
+        {
+            Environment.SetEnvironmentVariable("path", p+";" + Environment.GetEnvironmentVariable("path"));
         }
     }
 }

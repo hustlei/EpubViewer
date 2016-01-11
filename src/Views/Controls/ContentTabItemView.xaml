@@ -1,0 +1,8 @@
+﻿<cef:ChromiumWebBrowser x:Class="EpubViewer.ContentTabItemView"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:cef="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+                        xmlns:cm="http://www.caliburnproject.org"
+                        Address="{Binding Address,Mode=TwoWay}"
+                        Title="{Binding Title,Mode=OneWayToSource}"
+                        WebBrowser="{Binding WebBrowser,Mode=OneWayToSource}"/>

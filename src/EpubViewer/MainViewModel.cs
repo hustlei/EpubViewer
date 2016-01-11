@@ -24,17 +24,22 @@ namespace EpubViewer
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     [Export(typeof (MainViewModel))]
-    public class MainViewModel : Screen
+    public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
         private readonly IWindowManager _windowManager;
         private readonly EpubService _epubService;
         private readonly winform.OpenFileDialog _openDlg;
 
+        private winform.TreeNode _nodes; 
+        public winform.TreeNode Nodes {
+            get { return _nodes; }
+            set { _nodes = value;NotifyOfPropertyChange("Nodes"); }
+        }
+
         private Visibility _waitingVisible;
-        
         public Visibility WaitingVisible {
             get { return _waitingVisible; }
-            set { _waitingVisible=value;NotifyOfPropertyChange(()=>WaitingVisible); }
+            set { _waitingVisible=value;NotifyOfPropertyChange("WaitingVisible"); }
         }
         public bool AllowDrop { get; set; }
         [ImportingConstructor]
@@ -49,7 +54,7 @@ namespace EpubViewer
                 RestoreDirectory = true
             };
             WaitingVisible=Visibility.Collapsed;
-            AllowDrop = false;
+            AllowDrop = true;
         }
         public void Open()
         {
@@ -61,17 +66,19 @@ namespace EpubViewer
                     if (_openDlg.FileNames.Length > 0 && _openDlg.FileNames[0].Length > 0)
                     {
                         _epubService.OpenFiles(_openDlg.FileNames);
+                        Nodes = _epubService.TreeNode;
+                        if(ActiveItem==null)
+                            NewTab();
+                        if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
+                            ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
+
                     }
+                    NotifyOfPropertyChange("Nodes");
                     WaitingVisible = Visibility.Collapsed;//ok可行
                 });
-                //task.ContinueWith(t =>
-                //    {
-                //        //if (_epubService.EpubList[0].IsSpine)
-                //        //    contentItem.UseDocumentTitle = true;
+
                 //        //treeView.SelectedNode = treeView.Nodes[0];
                 //        //treeView.SelectedNode.Expand();
-                //        WaitingVisible = Visibility.Collapsed;
-                //    }, TaskScheduler.FromCurrentSynchronizationContext());
             }
         }
 
@@ -80,84 +87,20 @@ namespace EpubViewer
             _epubService.CloseFiles();
         }
 
-        public void Drop(object e)
+        public void Drop(DragEventArgs e)
         {
-            
+            string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            _epubService.OpenFiles(new string[] { fileName });
         }
+
+        public void DragEnter(DragEventArgs e)
+        {
+            e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.All : DragDropEffects.None;
+        }
+
         /* 多线程
-        public void OpenFiles(string[] files)
-        {
-            /*
-            waiting.Visibility = Visibility.Visible;
-            Task ab= Task.Factory.StartNew(() =>
-            {
-                foreach (string file in files)
-                {
-                    if (epubList.Count == 0 || epubList.Any(a => a.Filename != file))
-                    {
-                        epubList.Add(new EpubBook());
-                        epubList[epubList.Count - 1].Open(file);
-                    }
-                }
-            });
-            ab.ContinueWith(
-                t =>
-                {
-                    foreach (EpubBook f in epubList)
-                    {
-                        treeView.Nodes.Add(f.TreeNode);
-                    }
-                    if (epubList[0].IsSpine)
-                        contentItem.UseDocumentTitle = true;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    treeView.SelectedNode.Expand();
-                    waiting.Visibility = Visibility.Collapsed;
-                },TaskScheduler.FromCurrentSynchronizationContext()
-                );
-            
-            
-            //BackgroundWorker实现异步执行,并更改界面
-            waiting.Visibility = Visibility.Visible;
-            private BackgroundWorker backWorker;
-            backWorker = new BackgroundWorker();
-            backWorker.DoWork += (object sender, DoWorkEventArgs e) =>
-            {
-                foreach (string file in files)
-                {
-                    if (epubList.Count==0 || epubList.Any(a => a.Filename != file))
-                    {
-                        epubList.Add(new EpubBook());
-                        epubList[epubList.Count - 1].Open(file);
-                    }
-                }
-            };
-            backWorker.RunWorkerCompleted += (object seder, RunWorkerCompletedEventArgs e) =>
-            {
-                foreach (EpubBook f in epubList)
-                {
-                    treeView.Nodes.Add(f.TreeNode);
-                }
-                if (epubList[0].IsSpine)
-                    contentItem.UseDocumentTitle = true;
-                treeView.SelectedNode = treeView.Nodes[0];
-                treeView.SelectedNode.Expand();
-                waiting.Visibility = Visibility.Collapsed;
-            };
-            backWorker.RunWorkerAsync();
-            
 
-
-            //waiting.Visibility = Visibility.Visible;
-            ////模拟winform Doevent，效率低，建议改多线程
-            //DispatcherFrame frame = new DispatcherFrame(true);
-            //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (System.Threading.SendOrPostCallback)delegate(object arg)
-            //{
-            //    DispatcherFrame fr = arg as DispatcherFrame;
-            //    fr.Continue = false;
-            //}, frame);
-            //Dispatcher.PushFrame(frame);
-        }
-    */
         //#region 左边栏treeview相关函数
         //private void collapse(object sender, winform.TreeViewCancelEventArgs e)
         //{
@@ -203,13 +146,34 @@ namespace EpubViewer
         //    catch { }
         //}
         //# endregion
+         */
 
-        //#region 内容主题tabcontrol相关函数
-        //private void contentItemChanged(object sender, SelectionChangedEventArgs e)
+        #region 内容主题tabcontrol相关函数
+        //private void ContentTabChanged(object sender)
         //{
-        //    contentItem = (ContentItem)content.SelectedItem;
+        //    contentItem = ((TabControl)sender).SelectedContent;
         //}
-        //#endregion
+        #endregion
+
+        public async void NewTab()
+        {
+            var item = new ContentTabItemViewModel();
+            await ActivateItem(item);
+            //item.DisplayName = item.WebBrowser.Title;
+
+            //if (_epubList.Count < 1)
+            //    return;
+            //contentItem = new ContentItem();
+            //if (_epubList[0].IsSpine)
+            //    contentItem.UseDocumentTitle = true;
+            //content.Items.Add(contentItem);
+            //content.SelectedItem = contentItem;
+        }
+
+        public void CloseTab(RoutedEventArgs e)
+        {
+            this.CloseItem(((FrameworkElement)e.OriginalSource).DataContext);
+        }
         /*
         private void Back_Click(object sender, RoutedEventArgs e)
         {
@@ -280,16 +244,6 @@ namespace EpubViewer
             catch { }
             System.Windows.Forms.SendKeys.SendWait("^-");
         }
-        private void NewTab_Click(object sender, RoutedEventArgs e)
-        {
-            if (_epubList.Count < 1)
-                return;
-            contentItem = new ContentItem();
-            if (_epubList[0].IsSpine)
-                contentItem.UseDocumentTitle = true;
-            content.Items.Add(contentItem);
-            content.SelectedItem = contentItem;
-        }
         private void Find_Click(object sender, RoutedEventArgs e)
         {
             if (contentItem != null)
@@ -309,7 +263,7 @@ namespace EpubViewer
         }*/
         public void Config()
         {
-            var settings = new Dictionary<string, object> {{"Topmost", true}, {"Owner", GetView()}};//Topmost，Owner不是依赖属性不能绑定,只能在这里设置
+            var settings = new Dictionary<string, object> {{"Topmost", true}, {"Owner", GetView()}};//Owner不是依赖属性不能绑定,只能在这里设置
             _windowManager.ShowDialog(new ConfigViewModel(), null, settings);
         }
         /*
@@ -361,25 +315,6 @@ namespace EpubViewer
         {
             if (e.Key == Key.Enter)
                 searchButton_Click(null, null);
-        }
-
-        private void MainWindow_OnDragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effects = DragDropEffects.All;
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
-        }
-
-        private void MainWindow_OnDrop(object sender, DragEventArgs e)
-        {
-            string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
-            //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            this.OpenFiles(new string[] { fileName });
         }*/
     }
 }

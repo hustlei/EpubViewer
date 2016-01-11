@@ -75,8 +75,24 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Caliburn.Micro">
+      <HintPath>..\..\libraries\Caliburn.Micro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Caliburn.Micro.Platform">
       <HintPath>..\..\libraries\Caliburn.Micro.Platform.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CefSharp">
+      <HintPath>..\..\libraries\views\cefx86\CefSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CefSharp.Core">
+      <HintPath>..\..\libraries\views\cefx86\CefSharp.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CefSharp.Wpf">
+      <HintPath>..\..\libraries\views\cefx86\CefSharp.Wpf.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -106,7 +122,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\ContentItem.xaml">
+    <Page Include="Controls\ContentTabItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -136,9 +152,7 @@
     <Compile Include="Controls\TocTree.xaml.cs">
       <DependentUpon>TocTree.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ContentItem.xaml.cs">
-      <DependentUpon>ContentItem.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Converters\IndexToImageConverter.cs" />
     <Compile Include="Dialogs\SearchWin.xaml.cs">
       <DependentUpon>SearchWin.xaml</DependentUpon>
     </Compile>
@@ -176,6 +190,11 @@
     <Resource Include="img\Forward.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EpubService\EpubService.csproj">
+      <Project>{59ae3aa9-9c24-4e5e-8142-0a84741e940e}</Project>
+      <Name>EpubService</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MordenWin\MordenWin.csproj">
       <Project>{998d84c8-bcec-4d03-92ef-ff8174f0ad01}</Project>
       <Name>MordenWin</Name>

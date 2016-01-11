@@ -84,10 +84,24 @@
       <HintPath>..\..\libraries\Caliburn.Micro.Platform.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CefSharp">
+      <HintPath>..\..\libraries\views\cefx86\CefSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CefSharp.Wpf">
+      <HintPath>..\..\libraries\views\cefx86\CefSharp.Wpf.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Threading.Tasks">
+      <HintPath>..\..\libraries\System.Threading.Tasks.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -117,6 +131,7 @@
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Assoc.cs" />
     <Compile Include="ConfigViewModel.cs" />
+    <Compile Include="ContentTabItemViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -130,6 +145,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EpubLib\EpubLib.csproj">
+      <Project>{6111C6D5-FD21-48DC-89CB-7425433D67B3}</Project>
+      <Name>EpubLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EpubService\EpubService.csproj">
       <Project>{59ae3aa9-9c24-4e5e-8142-0a84741e940e}</Project>
       <Name>EpubService</Name>

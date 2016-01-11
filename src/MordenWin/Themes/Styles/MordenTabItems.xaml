@@ -68,7 +68,7 @@
                             </Grid.ColumnDefinitions>
                             <!--<ContentPresenter Grid.Column="0" Content="{Binding}"/>-->
                             <TextBlock Text="{TemplateBinding Header}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,1"></TextBlock>
-                            <Button Grid.Column="1" Click="Button_Click" Margin="0,1" Width="15" Height="15"
+                            <Button Grid.Column="1" Click="ItemClose" Margin="0,1" Width="15" Height="15"
                                 Style="{DynamicResource SystemButtonWithBorder}" VerticalAlignment="Center">
                                 <Path Width="8" Height="7" StrokeThickness="1.5" Data="M0,0 L8,7 M8,0 L0,7 Z"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"                                 
@@ -95,6 +95,7 @@
         </Setter>
     </Style>
 
+   
     <!--<Style TargetType="TabItem" x:Key="MordenTabItemWithClose">
         <Setter Property="Template">
             <Setter.Value>

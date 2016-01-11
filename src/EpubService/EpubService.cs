@@ -17,17 +17,21 @@ namespace EpubViewer
         private readonly List<EpubBook> _epubList;
 
         public TreeNode TreeNode;
-        public List<BitmapImage> Images;
-        public List<EpubBook> EpubList { get { return _epubList; } } 
-        public EpubService()
+        public static List<BitmapImage> Images { get;set; }
+        public List<EpubBook> EpubList { get { return _epubList; } }
+
+        static EpubService()
         {
-            _epubList = new List<EpubBook>();
-            TreeNode=new TreeNode();
             Images = new List<BitmapImage>();
             foreach (System.Drawing.Image img in EpubBook.ImageList.Images)
             {
                 Images.Add((BitmapImage)ImageConverter.ConvertFromWinform(img));
             }
+        }
+        public EpubService()
+        {
+            _epubList = new List<EpubBook>();
+            TreeNode=new TreeNode();
         }
 
         public void OpenFiles(string[] files)

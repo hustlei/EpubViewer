@@ -8,9 +8,7 @@
         <ResourceDictionary Source="/MordenWin;component/Converters/Converters.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-
     <Style TargetType="mwin:MordenWindow">
-
         <!--<Setter Property="Width" Value="800" />
         <Setter Property="Height" Value="640" />-->
         <Setter Property="MinWidth" Value="50" />

@@ -77,6 +77,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\TabItemWithClose.cs" />
     <Compile Include="Themes\Styles\MordenTabItemsDict.cs" />
     <Page Include="Controls\BackGroundPicker.xaml">
       <SubType>Designer</SubType>
@@ -87,6 +88,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Colors\Colors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Styles\TabItemWithClose.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -128,7 +133,6 @@
     </Compile>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
