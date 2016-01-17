@@ -102,6 +102,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -115,10 +118,6 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Page Include="Controls\Waiting.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\TocTree.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -149,10 +148,6 @@
     <Compile Include="Controls\Waiting.xaml.cs">
       <DependentUpon>Waiting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\TocTree.xaml.cs">
-      <DependentUpon>TocTree.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Converters\IndexToImageConverter.cs" />
     <Compile Include="Dialogs\SearchWin.xaml.cs">
       <DependentUpon>SearchWin.xaml</DependentUpon>
     </Compile>
@@ -190,6 +185,11 @@
     <Resource Include="img\Forward.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EpubLib\EpubLib.csproj">
+      <Project>{6111c6d5-fd21-48dc-89cb-7425433d67b3}</Project>
+      <Name>EpubLib</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\EpubService\EpubService.csproj">
       <Project>{59ae3aa9-9c24-4e5e-8142-0a84741e940e}</Project>
       <Name>EpubService</Name>

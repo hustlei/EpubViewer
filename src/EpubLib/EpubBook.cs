@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
 using Ionic.Zip;
 
 namespace Lei.Common
@@ -12,16 +15,12 @@ namespace Lei.Common
     public partial class EpubBook
     {
         /// <summary>
-        /// 存储了4个图标，默认图标为[0]文件夹图标、[1]打开的文件夹图标、[2]选中的文章图标、[3]未选中的文章图标
-        /// </summary>
-        public static ImageList ImageList { get; set; }
-        /// <summary>
         /// Epub电子书目录树，根节点为书名（根节点链接为封面），二级节点含目录和各个章节
         /// 每个节点的name存储url，text存储章节/文章名称
-        /// 有子节点的节点的ImageIndex和selectedImageIndex都设置为ImageList的第1个图标（文件夹图标）
-        /// 无子节点的节点ImageIndex设置为ImageList的第3个图标(选中的文章图标)和selectedImageIndex设置为ImageList的第4个图标(未选中的文章图标)
+        /// 有子节点的节点的Icon都设置为CollepsedIcon（文件夹图标）
+        /// 无子节点的节点Icon设置为PageIcon(未选中的文章图标)
         /// </summary>
-        public TreeNode TreeNode { get; set; }
+        public ItemNode TocNode { get; set; }
         /// <summary>
         /// 一般Epub电子书都有树形目录和顺序阅读两种目录，IsSpine=false则TreeNode读取树形目录，否则TreeNode存储顺序阅读目录；
         /// 在没有树形目录时，会自动读取顺序阅读目录。
@@ -53,12 +52,6 @@ namespace Lei.Common
         //private bool SelectedNode_Flag;
         //private bool Navigated_Flag;
 
-        //private string Encoding_Default = "";
-        //private string Encoding_URL = "";
-        //private bool Encoding_Reflesh;
-        //public static Encoding defaultCoding;
-        //public static string defaultCodingString;
-
         private string tempPath = "";
         private string coverContent = "";//从opf文件读取
         private string coverUrl = "";//从opf文件读取
@@ -68,25 +61,11 @@ namespace Lei.Common
         /// </summary>
         static EpubBook()
         {
-            ImageList = new ImageList();
-            ImageList.Images.Add(Properties.Resources.Book_angle);
-            ImageList.Images.Add(Properties.Resources.Book_open);
-            ImageList.Images.Add(Properties.Resources.Page);
-            ImageList.Images.Add(Properties.Resources.PageUnselect);
-
         }
         public EpubBook()
         {
             IsSpine = false;
             StateMsg = "";
-            //try
-            //{
-            //    defaultCoding = Encoding.Default;
-            //    defaultCodingString = "System Default (" + defaultCoding.WebName.ToUpper() + ")";
-            //}
-            //catch
-            //{
-            //}
         }
         /// <summary>
         /// 打开一个Epub电子书
@@ -97,24 +76,70 @@ namespace Lei.Common
             Close();
             if (!this.extractEpubFile(filename))
             {
-                
-                MessageBox.Show("Cannot open file \"" + filename + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Cannot open file \"" + filename + "\".", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Hand);
                 return false;
             }
             this.Filename = filename;
             this.Title = Path.GetFileNameWithoutExtension(filename);
             this.readEPUBFile();
-            if (TreeNode == null)
+            if (TocNode == null)
             {
-                MessageBox.Show("\"" + filename + "\"is not a epub file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("\"" + filename + "\"is not a epub file.", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Hand);
                 return false;
             }
-            if (TreeNode.Nodes.Count == 0)
+            if (TocNode.Nodes.Count == 0)
             {
-                MessageBox.Show("No book information in file \"" + filename + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("No book information in file \"" + filename + "\".", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return false;
             }
             return true;
+        }
+        /// <summary>
+        /// 异步打开一个Epub电子书
+        /// 只有在UI线程调用才能直接绑定TocNode，否则建议复制TocNode后绑定，因为被绑定属性必须在UI线程创建
+        /// </summary>
+        /// <param name="filename">Epub文档完整路径及文件名</param>
+        public Task<bool> OpenAsync(string filename)
+        {
+            Close();
+            var t = Task.Factory.StartNew(() =>
+            {
+                if (!this.extractEpubFile(filename))
+                {
+                    MessageBox.Show("Cannot open file \"" + filename + "\".", "Error", MessageBoxButtons.OK,
+                        MessageBoxIcon.Hand);
+                    return false;
+                }
+                return true;
+            });
+            return t.ContinueWith(x =>
+            {
+                if (x.Result)
+                {
+                    this.Filename = filename;
+                    this.Title = Path.GetFileNameWithoutExtension(filename);
+                    this.readEPUBFile();
+                    if (TocNode == null)
+                    {
+                        MessageBox.Show("\"" + filename + "\"is not a epub file.", "Error", MessageBoxButtons.OK,
+                            MessageBoxIcon.Hand);
+                        Close();
+                        return false;
+                    }
+                    if (TocNode.Nodes.Count == 0)
+                    {
+                        MessageBox.Show("No book information in file \"" + filename + "\".", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                        Close();
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
         public void Close()
         {
@@ -132,7 +157,7 @@ namespace Lei.Common
             //this.Encoding_Default = "";
             //this.Encoding_URL = "";
             //this.Encoding_Reflesh = false;
-            this.TreeNode = null;
+            this.TocNode = null;
 
             try
             {
@@ -207,9 +232,9 @@ namespace Lei.Common
             //try
             //{
             foreach (string current in opfFileList)
-                {
-                    this.readContentOPF(current);
-                }
+            {
+                this.readContentOPF(current);
+            }
             //    if (tree.Nodes.Count > 0)
             //    {
             //        tree.Nodes[0].Expand();
@@ -446,9 +471,9 @@ namespace Lei.Common
                 toc = contentPath + "\\" + menifestHerflist[num];
             }
             //读取NCX目录
-            TreeNode = new TreeNode(this.Title, 0, 0);
-            if(!IsSpine)
-            this.readTocNCX(TreeNode, toc);
+            TocNode = new ItemNode(this.Title, "", ItemNode.CollepsedIcon);
+            if (!IsSpine)
+                this.readTocNCX(TocNode, toc);
 
             #region TreeNode子节点内插入reference下内容
             try
@@ -459,9 +484,9 @@ namespace Lei.Common
                     {
                         bool flag = false;
                         string fileURL = this.getFileURL(contentPath, referenceHreflist[m]);
-                        for (int n = 0; n < TreeNode.Nodes.Count; n++)
+                        for (int n = 0; n < TocNode.Nodes.Count; n++)
                         {
-                            if (this.equalsFileURL(TreeNode.Nodes[n].Name, fileURL))
+                            if (this.equalsFileURL(TocNode.Nodes[n].Name, fileURL))
                             {
                                 flag = true;
                                 break;
@@ -474,7 +499,7 @@ namespace Lei.Common
                             {
                                 referenceTitleText = "[untitled]";
                             }
-                            TreeNode.Nodes.Insert(0, fileURL, referenceTitleText, 2, 3);
+                            TocNode.Nodes.Insert(0, new ItemNode(referenceTitleText, fileURL, ItemNode.PageIcon));
                         }
                     }
                 }
@@ -486,12 +511,12 @@ namespace Lei.Common
             #region TreeNode子节点没有封面的话，就把TreeNode节点链接设为封面链接
             try
             {
-                if (!string.IsNullOrEmpty(coverUrltext) && !this.equalsFileURL(TreeNode.Name, coverUrltext))
+                if (!string.IsNullOrEmpty(coverUrltext) && !this.equalsFileURL(TocNode.Name, coverUrltext))
                 {
                     bool flag2 = false;
-                    for (int num2 = 0; num2 < TreeNode.Nodes.Count; num2++)
+                    for (int num2 = 0; num2 < TocNode.Nodes.Count; num2++)
                     {
-                        if (this.equalsFileURL(TreeNode.Nodes[num2].Name, coverUrltext))
+                        if (this.equalsFileURL(TocNode.Nodes[num2].Name, coverUrltext))
                         {
                             flag2 = true;
                             break;
@@ -499,7 +524,7 @@ namespace Lei.Common
                     }
                     if (!flag2)
                     {
-                        TreeNode.Name = coverUrltext;
+                        TocNode.Name = coverUrltext;
                     }
                 }
             }
@@ -515,9 +540,9 @@ namespace Lei.Common
                 {
                     bool flag3 = false;
                     string fileURL2 = this.getFileURL(contentPath, spineToclist[num3]);
-                    for (int num4 = 0; num4 < TreeNode.Nodes.Count; num4++)
+                    for (int num4 = 0; num4 < TocNode.Nodes.Count; num4++)
                     {
-                        if (this.equalsFileURL(TreeNode.Nodes[num4].Name, fileURL2))
+                        if (this.equalsFileURL(TocNode.Nodes[num4].Name, fileURL2))
                         {
                             flag3 = true;
                             break;
@@ -531,14 +556,14 @@ namespace Lei.Common
                         {
                             text6 = "[untitled]";
                         }
-                        TreeNode.Nodes.Add(fileURL2, text6, 2, 3);
+                        TocNode.Nodes.Add(new ItemNode(text6, fileURL2, ItemNode.PageIcon));
                     }
                 }
             }
             #endregion
             this.Information = "Title: " + this.Title + "\n" + this.Information;
         }
-        private void readTocNCX(TreeNode rootNode, string toc)
+        private void readTocNCX(ItemNode rootNode, string toc)
         {
             if (!File.Exists(toc))
             {
@@ -557,7 +582,7 @@ namespace Lei.Common
                     if (xmlNode != null && xmlNode.InnerText != "" && this.Title != xmlNode.InnerText)
                     {
                         this.Title = xmlNode.InnerText;
-                        if (TreeNode.Nodes.Count > 0)
+                        if (TocNode.Nodes.Count > 0)
                         {
                             rootNode.Text = this.Title;
                         }
@@ -588,7 +613,7 @@ namespace Lei.Common
         /// <param name="node">navpoint节点</param>
         /// <param name="treeNode">将navpoint节点加入treepoint</param>
         /// <param name="filePath">contant内链接文件的路径</param>
-        private void AddNavPoint(XmlNode node, TreeNode treeNode, string filePath, XmlNamespaceManager nsmgr)
+        private void AddNavPoint(XmlNode node, ItemNode treeNode, string filePath, XmlNamespaceManager nsmgr)
         {
             XmlNode navText = node["navLabel"]["text"];
             XmlNode navContent = node["content"];
@@ -601,7 +626,8 @@ namespace Lei.Common
                 {
                     if (!string.IsNullOrEmpty(url))
                     {
-                        TreeNode currentTreeNode=treeNode.Nodes.Add(url, text,0,0);
+                        ItemNode currentTreeNode = new ItemNode(text, url, ItemNode.CollepsedIcon);
+                        treeNode.Nodes.Add(currentTreeNode);
                         foreach (XmlNode n in childNavNodes)
                             AddNavPoint(n, currentTreeNode, filePath, nsmgr);
                     }
@@ -613,7 +639,7 @@ namespace Lei.Common
                 {
                     if (!string.IsNullOrEmpty(url))
                     {
-                        treeNode.Nodes.Add(url, text, 2, 3);
+                        treeNode.Nodes.Add(new ItemNode(text, url, ItemNode.PageIcon));
                     }
                 }
             }

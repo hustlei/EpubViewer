@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using Lei.Common;
 using Lei.UI;
 using winform = System.Windows.Forms;
 
@@ -17,6 +18,19 @@ namespace EpubViewer
         public MainView()
         {
             InitializeComponent();
+        }
+
+        //private void TocTreeView_OnExpanded(object sender, RoutedEventArgs e)
+        //{
+        //    ((ItemNode)((TreeViewItem)e.OriginalSource).DataContext).Icon=null;
+        //}
+        private void AboutClick(object sender, RoutedEventArgs e)
+        {
+            about dlg = new about();
+            dlg.Owner = this;
+            dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            dlg.Topmost = true;
+            dlg.ShowDialog();
         }
     }
 }

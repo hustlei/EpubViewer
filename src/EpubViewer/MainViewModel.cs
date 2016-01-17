@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,69 +19,76 @@ using System.Windows.Shapes;
 using Caliburn.Micro;
 using winform = System.Windows.Forms;
 using System.Threading.Tasks;
+using CefSharp;
+using Lei.Common;
 
 namespace EpubViewer
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    [Export(typeof (MainViewModel))]
+    [Export(typeof(MainViewModel))]
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
         private readonly IWindowManager _windowManager;
         private readonly EpubService _epubService;
         private readonly winform.OpenFileDialog _openDlg;
-
-        private List<winform.TreeNode> _nod; 
-        public List<winform.TreeNode> Nod {
-            get { return _nod; }
-            set { _nod = value;NotifyOfPropertyChange("Nod"); }
-        }
+        static TaskScheduler TS = TaskScheduler.FromCurrentSynchronizationContext();
+        public BindableCollection<ItemNode> Nodes { get; private set; }
 
         private Visibility _waitingVisible;
-        public Visibility WaitingVisible {
+        public Visibility WaitingVisible
+        {
             get { return _waitingVisible; }
-            set { _waitingVisible=value;NotifyOfPropertyChange("WaitingVisible"); }
+            set { _waitingVisible = value; NotifyOfPropertyChange("WaitingVisible"); }
         }
         public bool AllowDrop { get; set; }
         [ImportingConstructor]
         public MainViewModel(IWindowManager windowManager)
         {
             _windowManager = windowManager;
-            _epubService= new EpubService();
+            _epubService = new EpubService();
             _openDlg = new winform.OpenFileDialog
             {
                 Filter = "EPUB Files(*.epub)|*.epub|EPUB Files(*.epub3)|*.epub3",
                 Multiselect = true,
                 RestoreDirectory = true
             };
-            WaitingVisible=Visibility.Collapsed;
+            WaitingVisible = Visibility.Collapsed;
             AllowDrop = true;
+            Nodes = new BindableCollection<ItemNode>();
         }
         public void Open()
         {
             if (_openDlg.ShowDialog() == winform.DialogResult.OK)
             {
-                WaitingVisible = Visibility.Visible;
-                var task = Task.Factory.StartNew(() =>
+                if (_openDlg.FileNames.Length > 0 && _openDlg.FileNames[0].Length > 0)
                 {
-                    if (_openDlg.FileNames.Length > 0 && _openDlg.FileNames[0].Length > 0)
+                    WaitingVisible = Visibility.Visible;
+                    var t = _epubService.OpenFilesAsync(_openDlg.FileNames);
+                    t.ContinueWith(t1 =>
                     {
-                        _epubService.OpenFiles(_openDlg.FileNames);
-                        Nod=_epubService.TreeNode;
-                        if(ActiveItem==null)
-                            NewTab();
-                        if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
-                            ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
-                    }
-                    WaitingVisible = Visibility.Collapsed;//ok可行
-                });
-
-                //        //treeView.SelectedNode = treeView.Nod[0];
-                //        //treeView.SelectedNode.Expand();
+                        if (t1.Result)
+                        {
+                            try
+                            {
+                                Nodes.Add(_epubService.EpubList[_epubService.EpubList.Count - 1].TocNode);
+                                Nodes[Nodes.Count - 1].IsExpanded = true;
+                                Nodes[Nodes.Count - 1].IsSelected = true;
+                                Nodes[0].Icon = ItemNode.ExpandedIcon;
+                                if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
+                                    ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
+                            }
+                            catch (Exception e)
+                            {
+                                MessageBox.Show(e.Message);
+                            }
+                        }
+                        WaitingVisible = Visibility.Collapsed;
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }
             }
         }
-
         public void Close()
         {
             _epubService.CloseFiles();
@@ -98,171 +106,136 @@ namespace EpubViewer
             e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.All : DragDropEffects.None;
         }
 
-        /* 多线程
 
-        //#region 左边栏treeview相关函数
-        //private void collapse(object sender, winform.TreeViewCancelEventArgs e)
-        //{
-        //    e.Node.ImageIndex = 0;
-        //    e.Node.SelectedImageIndex = 0;
-        //}
-        //private void expand(object sender, winform.TreeViewCancelEventArgs e)
-        //{
-        //    e.Node.ImageIndex = 1;
-        //    e.Node.SelectedImageIndex = 1;
-        //}
-        //private void afterSelect(object sender, winform.TreeViewEventArgs e)
-        //{
-        //    if (contentItem == null)
-        //        NewTab_Click(null, null);
-        //    try
-        //    {
-        //        string url = "";
-        //        string text = "";
-        //        if (e != null)
-        //        {
-        //            url = e.Node.Name;
-        //            text = e.Node.Text;
-        //        }
-        //        else
-        //        {
-        //            if (treeView.SelectedNode != null)
-        //            {
-        //                url = treeView.SelectedNode.Name;
-        //                text = treeView.SelectedNode.Text;
-        //            }
-        //        }
-        //        if (url != "")
-        //        {
-        //            //contentItem.browser.Url = new Uri(Uri.EscapeUriString(url));
-        //            //暂时不知道为什么不支持中文锚点
-        //            Uri xx = new Uri(url);
-        //            contentItem.browser.Navigate(xx);
-        //            //    MessageBox.Show(xx + " " + contentItem.browser.Url.ToString());
-        //            contentItem.Header = text;
-        //        }
-        //    }
-        //    catch { }
-        //}
-        //# endregion
-         */
+        #region 左边栏treeview相关函数
+        public void TocSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
+        {
+            ItemNode node = e.NewValue as ItemNode;
+            try
+            {
+                string url = "";
+                string text = "";
+
+                if (node != null)
+                {
+                    url = node.Name;
+                    text = node.Text;
+                }
+                if (url != "")
+                {
+                    if (ActiveItem == null)
+                        NewTab();
+                    ((ContentTabItemViewModel) ActiveItem).Address = url;
+                    ((ContentTabItemViewModel) ActiveItem).DisplayName = text;
+                }
+                else
+                {
+                    MessageBox.Show("未找到页面。");
+                }
+            }
+            catch
+            {
+            }
+        }
+        # endregion
+
 
         #region 内容主题tabcontrol相关函数
-        //private void ContentTabChanged(object sender)
-        //{
-        //    contentItem = ((TabControl)sender).SelectedContent;
-        //}
-        #endregion
-
         public void NewTab()
         {
             var item = new ContentTabItemViewModel();
             ActivateItem(item);
-            //item.DisplayName = item.WebBrowser.Title;
-
-            //if (_epubList.Count < 1)
-            //    return;
-            //contentItem = new ContentItem();
-            //if (_epubList[0].IsSpine)
-            //    contentItem.UseDocumentTitle = true;
-            //content.Items.Add(contentItem);
-            //content.SelectedItem = contentItem;
         }
-
         public void CloseTab(RoutedEventArgs e)
         {
             this.CloseItem(((FrameworkElement)e.OriginalSource).DataContext);
         }
-        /*
-        private void Back_Click(object sender, RoutedEventArgs e)
+        #endregion
+        
+        public void Back()
         {
-            if (contentItem != null && contentItem.browser.CanGoBack)
-                contentItem.browser.GoBack();
-        }
-        private void Forward_Click(object sender, RoutedEventArgs e)
-        {
-            if (contentItem != null && contentItem.browser.CanGoForward)
-                contentItem.browser.GoForward();
-        }
-        private void Sync_Click(object sender, RoutedEventArgs e)
-        {
-            if (_epubList.Count < 1)
+            if (ActiveItem == null)
                 return;
-            string url = contentItem.browser.Url.OriginalString;
-            foreach (System.Windows.Forms.TreeNode t in treeView.Nod)
+            var browser = ((ContentTabItemViewModel) ActiveItem).WebBrowser;
+            if(browser.CanGoBack)
+                browser.Back();
+        }
+        public void Forward()
+        {
+            if (ActiveItem == null)
+                return;
+            var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
+            if (browser.CanGoForward)
+                browser.Forward();
+        }
+        public void Sync()
+        {
+            if (Nodes.Count < 1)
+                return;
+            if (ActiveItem == null)
+                return;
+            var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
+            string url = browser.Address;
+            foreach (ItemNode t in Nodes)
             {
-                System.Windows.Forms.TreeNode node = EpubBook.SearchNodeName(t, url);
+                var node = EpubBook.SearchNodeName(t, url);
                 if (node != null)
                 {
-                    treeView.SelectedNode = node;
+                    node.IsSelected = true;
                     return;
                 }
             }
         }
-        private void Print_Click(object sender, RoutedEventArgs e)
+        public void Print()
         {
-            if (contentItem != null)
-                contentItem.browser.Document.ExecCommand("Print", false, null);
+            if (ActiveItem == null)
+                return;
+            var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
+            browser.Print();
         }
-        private void Encoding_Click(object sender, RoutedEventArgs e)
+        public void Encoding_Click(object sender, RoutedEventArgs e)
         {
             //item.Document.Body.Style += "fontzise:120%;";
         }
 
-        private void ZoomIn_Click(object sender, RoutedEventArgs e)
+        public void ZoomIn()
         {
-            try
-            {
-                contentItem.browser.Focus();
-                if (contentItem.browser.Document != null)
-                {
-                    contentItem.browser.Document.Focus();
-                    if (contentItem.browser.Document.Body != null)
-                    {
-                        contentItem.browser.Document.Body.Focus();
-                    }
-                }
-            }
-            catch { }
-            System.Windows.Forms.SendKeys.SendWait("^=");
+            if (ActiveItem == null)
+                return;
+            var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
+            browser.ZoomLevel++;
         }
-        private void ZoomOut_Click(object sender, RoutedEventArgs e)
+        public void ZoomOut()
         {
-            try
-            {
-                contentItem.browser.Focus();
-                if (contentItem.browser.Document != null)
-                {
-                    contentItem.browser.Document.Focus();
-                    if (contentItem.browser.Document.Body != null)
-                    {
-                        contentItem.browser.Document.Body.Focus();
-                    }
-                }
-            }
-            catch { }
-            System.Windows.Forms.SendKeys.SendWait("^-");
+            if (ActiveItem == null)
+                return;
+            var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
+            browser.ZoomLevel--;
         }
-        private void Find_Click(object sender, RoutedEventArgs e)
-        {
-            if (contentItem != null)
-            {
-                SearchWin w = new SearchWin(contentItem.browser);
-                w.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                w.ShowDialog();
-            }
-        }
-        private void Info_Click(object sender, RoutedEventArgs e)
-        {
-            about dlg = new about();
-            dlg.Owner = this;
-            dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            dlg.Topmost = true;
-            dlg.ShowDialog();
-        }*/
+        //public void Find_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (contentItem != null)
+        //    {
+        //        SearchWin w = new SearchWin(contentItem.browser);
+        //        w.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        //        w.ShowDialog();
+        //    }
+        //}
+         
+
+        //about dialog display in view.xaml.cs
+        //private void Info_Click(object sender, RoutedEventArgs e)
+        //{
+        //    about dlg = new about();
+        //    dlg.Owner = this;
+        //    dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        //    dlg.Topmost = true;
+        //    dlg.ShowDialog();
+        //}
+
         public void Config()
         {
-            var settings = new Dictionary<string, object> {{"Topmost", true}, {"Owner", GetView()}};//Owner不是依赖属性不能绑定,只能在这里设置
+            var settings = new Dictionary<string, object> { { "Topmost", true }, { "Owner", GetView() } };//Owner不是依赖属性不能绑定,只能在这里设置
             _windowManager.ShowDialog(new ConfigViewModel(), null, settings);
         }
         /*
@@ -271,7 +244,7 @@ namespace EpubViewer
             foreach (EpubBook b in _epubList)
                 b.Close();
             _epubList = new List<EpubBook>();
-            treeView.Nod.Clear();
+            treeView.Nodes.Clear();
             content.Items.Clear();
         }
         private void Exit_Click(object sender, RoutedEventArgs e)
@@ -289,8 +262,8 @@ namespace EpubViewer
 
         private void searchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            contentItem.browser.Url = new Uri(((System.Windows.Forms.TreeNode)searchResult.SelectedItem).Name);
-            contentItem.Header = ((System.Windows.Forms.TreeNode)searchResult.SelectedItem).Text;
+            contentItem.browser.Url = new Uri(((System.Windows.Forms.TocNode)searchResult.SelectedItem).Name);
+            contentItem.Header = ((System.Windows.Forms.TocNode)searchResult.SelectedItem).Text;
         }
 
         private void searchButton_Click(object sender, RoutedEventArgs e)
@@ -300,13 +273,13 @@ namespace EpubViewer
             {
                 return;
             }
-            List<System.Windows.Forms.TreeNode> rst = new List<System.Windows.Forms.TreeNode>();
-            foreach (System.Windows.Forms.TreeNode t in treeView.Nod)
+            List<System.Windows.Forms.TocNode> rst = new List<System.Windows.Forms.TocNode>();
+            foreach (System.Windows.Forms.TocNode t in treeView.Nodes)
             {
                 EpubBook.SearchTopic(t, topic, rst);
             }
             if (rst.Count == 0)
-                rst.Add(new System.Windows.Forms.TreeNode("没有搜索到内容"));
+                rst.Add(new System.Windows.Forms.TocNode("没有搜索到内容"));
             searchResult.ItemsSource = rst;
         }
 

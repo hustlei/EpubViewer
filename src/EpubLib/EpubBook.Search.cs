@@ -10,29 +10,29 @@ namespace Lei.Common
 {
     partial class EpubBook
     {
-        public static TreeNode SearchNodeName(TreeNode treeNode, string text)
+        public static ItemNode SearchNodeName(ItemNode treeNode, string text)
         {
             if (treeNode.Name == text)
                 return treeNode;
             if (treeNode.Nodes.Count > 0)
             {
-                foreach (TreeNode n in treeNode.Nodes)
+                foreach (ItemNode n in treeNode.Nodes)
                 {
-                    TreeNode t = SearchNodeName(n, text);
+                    ItemNode t = SearchNodeName(n, text);
                     if (t != null)
                         return t;
                 }
             }
             return null;
         }
-        public static void SearchTopic(TreeNode treeNode, string topic, List<TreeNode> list)
+        public static void SearchTopic(ItemNode treeNode, string topic, List<ItemNode> list)
         {
             //if (Regex.IsMatch(treeNode.Text,text)
             if (treeNode.Text.Contains(topic))
                 list.Add(treeNode);
             if (treeNode.Nodes.Count > 0)
             {
-                foreach (TreeNode n in treeNode.Nodes)
+                foreach (var n in treeNode.Nodes)
                 {
                     SearchTopic(n, topic, list);
                 }
