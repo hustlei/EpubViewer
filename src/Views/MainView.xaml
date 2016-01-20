@@ -8,8 +8,7 @@
         cm:Message.Attach="[Event DragEnter]=[Action DragEnter($eventArgs)];
                  [Event Drop]=[Action Drop($eventArgs)]"
         LogoData="M5,15 L5,22 7,22 M12,16 L9,16 9,22 12,22 M9,19 L11,19 M15,15 L15,22"
-        Icon="img/epub.png"
-        Title="Epub Viewer 1.1 Lite">
+        Icon="img/epub.png">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -33,10 +32,10 @@
                     <MenuItem.Header>
                         <TextBlock Margin="8,1" TextAlignment="Center">文  件</TextBlock>
                     </MenuItem.Header>
-                    <MenuItem Header="打开"/>
-                    <MenuItem Header="关闭"/>
+                    <MenuItem Header="打开" cm:Message.Attach="FileOpen"/>
+                    <MenuItem Header="关闭" cm:Message.Attach="FileClose"/>
                     <Separator/>
-                    <MenuItem Header="退出"/>
+                    <MenuItem Header="退出" cm:Message.Attach="Exit"/>
                 </MenuItem>
                 <MenuItem Header="View">
                     <MenuItem x:Name="Coding" Header="Coding"/>
@@ -54,10 +53,10 @@
                 </Grid.ColumnDefinitions>
                 <ToolBar MinHeight="25" MaxHeight="30" IsOverflowOpen="False" BorderBrush="#33C8C8C8" BorderThickness="0,0,0,1"
                          Background="Transparent" Style="{StaticResource MordenToolBar}">
-                    <Button x:Name="Open" Height="25" Width="25" Margin="2,0">
+                    <Button x:Name="FileOpen" Height="25" Width="25" Margin="2,0">
                         <Image Source="img/open.png"/>
                     </Button>
-                    <Button x:Name="Close" Height="25" Width="25" Margin="2,0">
+                    <Button x:Name="FileClose" Height="25" Width="25" Margin="2,0">
                         <Image Source="img/close.png"/>
                     </Button>
                     <Separator/>
@@ -96,7 +95,7 @@
                 </ToolBar>
                 <ToolBar Grid.Column="1"  OverflowMode="Never" Background="Transparent" IsOverflowOpen="False"
                           Style="{StaticResource MordenToolBar}">
-                    <Button Height="25" Width="25" x:Name="About">
+                    <Button Height="25" Width="25" x:Name="About" Click="AboutClick">
                         <Image Source="img/Info.png"/>
                     </Button>
                 </ToolBar>
@@ -112,13 +111,14 @@
                         Background="Transparent" ClipToBounds="True">
                     <TabItem Header="目录" MinWidth="60" BorderBrush="LightGray" BorderThickness="1,0,1,1">
                         <TreeView x:Name="TocTreeView" ItemsSource="{Binding Nodes}"
-                                 cm:Message.Attach="[Event SelectedItemChanged]=[Action TocSelectedItemChanged($eventArgs)]"><!---->
+                                 cm:Message.Attach="[Event SelectedItemChanged]=[Action TocSelectedItemChanged($eventArgs)]">
+                            <!---->
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="{x:Type TreeViewItem}">
                                     <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay}"></Setter><!--不知道为什么必须要设为TwoWay-->
-                                    <Setter Property="IsSelected" Value="{Binding IsSelected}"></Setter>
-                                </Style>
-                            </TreeView.ItemContainerStyle >
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}"></Setter>
+                            </Style>
+                            </TreeView.ItemContainerStyle>
                             <TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate ItemsSource="{Binding Nodes}">
                                     <StackPanel Orientation="Horizontal">
@@ -137,11 +137,15 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="SearchText" Grid.Column="0" Margin="2,1"/>
-                                <Button x:Name="SearchButton" Grid.Column="1" Margin="2,1" Padding="8,1"
+                                <TextBox x:Name="SearchText" cm:Message.Attach="[Event KeyDown]=[Action SearchTextKeyDown($eventArgs)]" Grid.Column="0" Margin="2,1"/>
+                                <Button x:Name="Search" Grid.Column="1" Margin="2,1" Padding="8,1"
                                     xml:space="preserve">搜 索</Button>
                             </Grid>
-                            <ListView x:Name="SearchResult" BorderThickness="0" DisplayMemberPath="{Binding Text}">
+                            <ListView Name="SearchResult" BorderThickness="0"
+                                      ItemsSource="{Binding SearchResult}"
+                                      cm:Message.Attach="[Event SelectionChanged]=[Action SearchResultSelectionChanged($eventArgs)]">
+                                <!--
+                                      DisplayMemberPath="{Binding Text}"-->
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Text}"></TextBlock>
@@ -164,23 +168,23 @@
                 <TabControl x:Name="Items" Grid.Column="2" ClipToBounds="True"  Background="Transparent">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                                <Grid Name="Panel" Margin="0" Height="{TemplateBinding Height}" >
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" MinWidth="30"/>
-                                        <ColumnDefinition Width="17" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding DisplayName}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            <Grid Name="Panel" Margin="0" Height="{TemplateBinding Height}" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" MinWidth="30"/>
+                                    <ColumnDefinition Width="17" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding DisplayName}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                Margin="2,1,4,1"></TextBlock>
-                                    <Button x:Name="btn" Grid.Column="1" Margin="0,1" Width="15" Height="15"
+                                <Button x:Name="btn" Grid.Column="1" Margin="0,1" Width="15" Height="15"
                                             Style="{DynamicResource SystemButtonWithBorder}"
                                             cm:Message.Attach="CloseTab($eventArgs)"
                                             VerticalAlignment="Center" HorizontalAlignment="Right">
-                                        <!--经验证这样也是可行的cm:Message.Attack="CloseItem($dataContext)""-->
+                                    <!--经验证这样也是可行的cm:Message.Attack="CloseItem($dataContext)""-->
                                     <Path Width="8" Height="7" StrokeThickness="1.5" Data="M0,0 L8,7 M8,0 L0,7 Z"
                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" 
                                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Button>
-                                </Grid>
+                                </Button>
+                            </Grid>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                 </TabControl>

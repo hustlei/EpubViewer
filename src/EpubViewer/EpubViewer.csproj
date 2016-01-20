@@ -132,6 +132,7 @@
     <Compile Include="Assoc.cs" />
     <Compile Include="ConfigViewModel.cs" />
     <Compile Include="ContentTabItemViewModel.cs" />
+    <Compile Include="FindViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

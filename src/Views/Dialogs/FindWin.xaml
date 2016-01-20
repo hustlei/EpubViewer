@@ -1,4 +1,4 @@
-﻿<ui:MordenWindow x:Class="EpubViewer.SearchWin"
+﻿<ui:MordenWindow x:Class="EpubViewer.FindView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Lei.UI;assembly=MordenWin"
@@ -27,8 +27,8 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <TextBlock Margin="2,0,5,0" TextAlignment="Center" VerticalAlignment="Center">查 找:</TextBlock>
-        <TextBox x:Name="text" Grid.Column="1" Margin="4"></TextBox>
-        <Button x:Name="SearchButton" Grid.Column="1" Grid.Row="1" Width="80" Margin="5,3"
+        <TextBox x:Name="Text" Grid.Column="1" Margin="4"></TextBox>
+        <Button x:Name="Find" Grid.Column="1" Grid.Row="1" Width="80" Margin="5,3"
                 xml:space="preserve" HorizontalAlignment="Right">搜  索</Button>
     </Grid>
 </ui:MordenWindow>

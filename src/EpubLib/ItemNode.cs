@@ -49,13 +49,13 @@ namespace Lei.Common
             Nodes = new BindableCollection<ItemNode>();
             _isExpanded = false;
             _isSelected = false;
-            //Nodes.CollectionChanged += (sender, args) =>
-            //{
-            //    if (args.Action == NotifyCollectionChangedAction.Add)
-            //    {
-            //        ((ItemNode) args.NewItems[0]).Parent = (ItemNode) sender;
-            //    }
-            //};
+            Nodes.CollectionChanged += (sender, args) =>
+            {
+                if (args.Action == NotifyCollectionChangedAction.Add)
+                {
+                    ((ItemNode)args.NewItems[0]).Parent = this;
+                }
+            };
         }
 
         public ItemNode(string text)
@@ -110,17 +110,27 @@ namespace Lei.Common
             }
             set
             {
-                _isSelected = value==true;
+                _isSelected = value == true;
                 if (Nodes.Count == 0)
                     Icon = _isSelected ? PageIconSelected : PageIcon;
                 else if (_isExpanded)
                     Icon = _isSelected ? ExpandedIconSelected : ExpandedIcon;
                 else
                     Icon = _isSelected ? CollepsedIconSelected : CollepsedIcon;
+                if (_isSelected)
+                {
+                    var n = this;
+                    while (true)
+                    {
+                        if (n.Parent == null)
+                            return;
+                        n.Parent.IsExpanded = true;
+                        n = n.Parent;
+                    }
+                }
                 NotifyOfPropertyChange("IsSelected");
             }
         }
-
         public BindableCollection<ItemNode> Nodes { get; set; }
 
         public string Name { get; set; }

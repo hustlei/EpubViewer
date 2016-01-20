@@ -28,13 +28,18 @@ namespace EpubViewer
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     [Export(typeof(MainViewModel))]
-    public class MainViewModel : Conductor<IScreen>.Collection.OneActive
+    public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
         private readonly IWindowManager _windowManager;
         private readonly EpubService _epubService;
         private readonly winform.OpenFileDialog _openDlg;
         static TaskScheduler TS = TaskScheduler.FromCurrentSynchronizationContext();
-        public BindableCollection<ItemNode> Nodes { get; private set; }
+        private BindableCollection<ItemNode> _nodes; 
+        public BindableCollection<ItemNode> Nodes
+        {
+            get { return _nodes; }
+            private set { _nodes = value; NotifyOfPropertyChange("Nodes"); }
+        }
 
         private Visibility _waitingVisible;
         public Visibility WaitingVisible
@@ -46,6 +51,7 @@ namespace EpubViewer
         [ImportingConstructor]
         public MainViewModel(IWindowManager windowManager)
         {
+            DisplayName = "Epub Viewer 1.1";
             _windowManager = windowManager;
             _epubService = new EpubService();
             _openDlg = new winform.OpenFileDialog
@@ -57,8 +63,9 @@ namespace EpubViewer
             WaitingVisible = Visibility.Collapsed;
             AllowDrop = true;
             Nodes = new BindableCollection<ItemNode>();
+            SearchResult = new BindableCollection<ItemNode>();
         }
-        public void Open()
+        public void FileOpen()
         {
             if (_openDlg.ShowDialog() == winform.DialogResult.OK)
             {
@@ -89,11 +96,22 @@ namespace EpubViewer
                 }
             }
         }
-        public void Close()
+        public void FileClose()
         {
             _epubService.CloseFiles();
+            Items.Clear();
+        }
+        public void Config()
+        {
+            var settings = new Dictionary<string, object> { { "Topmost", true }, { "Owner", GetView() } };//Owner不是依赖属性不能绑定,只能在这里设置
+            _windowManager.ShowDialog(new ConfigViewModel(), null, settings);
         }
 
+        private void Exit(object sender, RoutedEventArgs e)
+        {
+            FileClose();
+            Environment.Exit(0);
+        }
         public void Drop(DragEventArgs e)
         {
             string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
@@ -125,8 +143,8 @@ namespace EpubViewer
                 {
                     if (ActiveItem == null)
                         NewTab();
-                    ((ContentTabItemViewModel) ActiveItem).Address = url;
-                    ((ContentTabItemViewModel) ActiveItem).DisplayName = text;
+                    ((ContentTabItemViewModel)ActiveItem).Address = url;
+                    ((ContentTabItemViewModel)ActiveItem).DisplayName = text;
                 }
                 else
                 {
@@ -151,13 +169,13 @@ namespace EpubViewer
             this.CloseItem(((FrameworkElement)e.OriginalSource).DataContext);
         }
         #endregion
-        
+
         public void Back()
         {
             if (ActiveItem == null)
                 return;
-            var browser = ((ContentTabItemViewModel) ActiveItem).WebBrowser;
-            if(browser.CanGoBack)
+            var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
+            if (browser.CanGoBack)
                 browser.Back();
         }
         public void Forward()
@@ -168,7 +186,7 @@ namespace EpubViewer
             if (browser.CanGoForward)
                 browser.Forward();
         }
-        public void Sync()
+        public void SyncToc()
         {
             if (Nodes.Count < 1)
                 return;
@@ -176,15 +194,18 @@ namespace EpubViewer
                 return;
             var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
             string url = browser.Address;
-            foreach (ItemNode t in Nodes)
+            Task.Factory.StartNew(() =>
             {
-                var node = EpubBook.SearchNodeName(t, url);
-                if (node != null)
+                foreach (ItemNode t in Nodes)
                 {
-                    node.IsSelected = true;
-                    return;
+                    var node = EpubBook.SearchNodeName(t, url);
+                    if (node != null)
+                    {
+                        node.IsSelected = true;
+                        return;
+                    }
                 }
-            }
+            });
         }
         public void Print()
         {
@@ -212,16 +233,15 @@ namespace EpubViewer
             var browser = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
             browser.ZoomLevel--;
         }
-        //public void Find_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (contentItem != null)
-        //    {
-        //        SearchWin w = new SearchWin(contentItem.browser);
-        //        w.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        //        w.ShowDialog();
-        //    }
-        //}
-         
+        public void Find()
+        {
+            if (ActiveItem != null)
+            {
+                var w = new FindViewModel(((ContentTabItemViewModel)ActiveItem).WebBrowser);
+                _windowManager.ShowDialog(w);
+            }
+        }
+
 
         //about dialog display in view.xaml.cs
         //private void Info_Click(object sender, RoutedEventArgs e)
@@ -233,60 +253,46 @@ namespace EpubViewer
         //    dlg.ShowDialog();
         //}
 
-        public void Config()
+        private string _searchText;
+        public string SearchText
         {
-            var settings = new Dictionary<string, object> { { "Topmost", true }, { "Owner", GetView() } };//Owner不是依赖属性不能绑定,只能在这里设置
-            _windowManager.ShowDialog(new ConfigViewModel(), null, settings);
-        }
-        /*
-        private void Close_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (EpubBook b in _epubList)
-                b.Close();
-            _epubList = new List<EpubBook>();
-            treeView.Nodes.Clear();
-            content.Items.Clear();
-        }
-        private void Exit_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (EpubBook b in _epubList)
-                b.Close();
-            Environment.Exit(0);
-        }
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-            foreach (EpubBook b in _epubList)
-                b.Close();
+            get { return _searchText; }
+            set { _searchText = value; NotifyOfPropertyChange("SearchText"); }
         }
 
-        private void searchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            contentItem.browser.Url = new Uri(((System.Windows.Forms.TocNode)searchResult.SelectedItem).Name);
-            contentItem.Header = ((System.Windows.Forms.TocNode)searchResult.SelectedItem).Text;
+        private BindableCollection<ItemNode> _searchResult; 
+        public BindableCollection<ItemNode> SearchResult {
+            get { return _searchResult; }
+            set { _searchResult = value;NotifyOfPropertyChange("SearchResult"); }
         }
 
-        private void searchButton_Click(object sender, RoutedEventArgs e)
+        public void Search()
         {
-            string topic = searchText.Text.Trim();
-            if (string.IsNullOrEmpty(topic))
+            SearchResult.Clear();
+            if (string.IsNullOrEmpty(_searchText))
             {
                 return;
             }
-            List<System.Windows.Forms.TocNode> rst = new List<System.Windows.Forms.TocNode>();
-            foreach (System.Windows.Forms.TocNode t in treeView.Nodes)
+            foreach (ItemNode t in Nodes)
             {
-                EpubBook.SearchTopic(t, topic, rst);
+                EpubBook.SearchTopic(t, _searchText, SearchResult);
             }
-            if (rst.Count == 0)
-                rst.Add(new System.Windows.Forms.TocNode("没有搜索到内容"));
-            searchResult.ItemsSource = rst;
+            if (SearchResult.Count == 0)
+                SearchResult.Add(new ItemNode("没有搜索到内容"));
         }
 
-        private void searchText_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        public void SearchTextKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
-                searchButton_Click(null, null);
-        }*/
+                Search();
+        }
+        public void SearchResultSelectionChanged(SelectionChangedEventArgs e)//
+        {
+            if (ActiveItem == null)
+                NewTab();
+            ((ContentTabItemViewModel)ActiveItem).Address = ((ItemNode)((ListView)e.Source).SelectedItem).Name;
+            //contentItem.browser.Url = new Uri(((System.Windows.Forms.TocNode)searchResult.SelectedItem).Name);
+            //contentItem.Header = ((System.Windows.Forms.TocNode)searchResult.SelectedItem).Text;
+        }
     }
 }

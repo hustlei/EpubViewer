@@ -42,15 +42,16 @@ namespace EpubViewer
             set { _webBrowser = value; NotifyOfPropertyChange("WebBrowser"); }
         }
 
+        //assignment at title property
         //private string _displyName;
-        //public override string DisplayName { get; set; }
+        //public override string DisplayName
         //{
         //    get
         //    {
-        //        if (UseDocumentTitle)
-        //        {
-        //            return Title;
-        //        }
+        //        //if (UseDocumentTitle)
+        //        //{
+        //        //    return Title;
+        //        //}
         //        return _displyName;
         //    }
         //    set { _displyName = value;NotifyOfPropertyChange("DisplayName"); }
@@ -62,9 +63,8 @@ namespace EpubViewer
         /// </summary>
         public ContentTabItemViewModel()
         {
-            Address = "http://baidu.com";
+            Address = "about:blank";
             DisplayName = "about:blank";
-            UseDocumentTitle = true;
         }
 
     }

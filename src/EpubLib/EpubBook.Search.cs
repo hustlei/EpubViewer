@@ -25,16 +25,16 @@ namespace Lei.Common
             }
             return null;
         }
-        public static void SearchTopic(ItemNode treeNode, string topic, List<ItemNode> list)
+        public static void SearchTopic(ItemNode treeNode, string topic, IList<ItemNode> outList)
         {
             //if (Regex.IsMatch(treeNode.Text,text)
             if (treeNode.Text.Contains(topic))
-                list.Add(treeNode);
+                outList.Add(treeNode);
             if (treeNode.Nodes.Count > 0)
             {
                 foreach (var n in treeNode.Nodes)
                 {
-                    SearchTopic(n, topic, list);
+                    SearchTopic(n, topic, outList);
                 }
             }
         }

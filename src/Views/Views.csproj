@@ -125,7 +125,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\SearchWin.xaml">
+    <Page Include="Dialogs\FindWin.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -148,8 +148,8 @@
     <Compile Include="Controls\Waiting.xaml.cs">
       <DependentUpon>Waiting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\SearchWin.xaml.cs">
-      <DependentUpon>SearchWin.xaml</DependentUpon>
+    <Compile Include="Dialogs\FindWin.xaml.cs">
+      <DependentUpon>FindWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ConfigWin.xaml.cs">
       <DependentUpon>ConfigWin.xaml</DependentUpon>

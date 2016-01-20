@@ -19,9 +19,9 @@ namespace EpubViewer
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SearchWin : MordenWindow
+    public partial class FindView : MordenWindow
     {
-        public SearchWin()
+        public FindView()
         {
             InitializeComponent();           
         }
