@@ -28,7 +28,7 @@
                             <AdornerDecorator>
                                 <Grid x:Name="LayoutRoot">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="28"/>
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="15" />
                                     </Grid.RowDefinitions>

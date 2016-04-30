@@ -42,7 +42,13 @@ namespace Lei.UI
             this.CommandBindings.Add(new CommandBinding(SystemCommands.MaximizeWindowCommand, OnMaximizeWindow, OnCanResizeWindow));
             this.CommandBindings.Add(new CommandBinding(SystemCommands.MinimizeWindowCommand, OnMinimizeWindow, OnCanMinimizeWindow));
             this.CommandBindings.Add(new CommandBinding(SystemCommands.RestoreWindowCommand, OnRestoreWindow, OnCanResizeWindow));
-
+            this.Loaded += (sender, args) =>
+            {
+                if (WindowStyle == WindowStyle.None)
+                    (this.Template.FindName("LayoutRoot", this) as
+                        Grid).RowDefinitions[0].Height =
+                        new GridLength(0);
+            };
         }
         public static void SetTheme(Color backColor)
         {
@@ -62,6 +68,7 @@ namespace Lei.UI
         {
             base.OnInitialized(e);
         }
+         
 
         public RoutedCommand SettingCommand
         {

@@ -27,7 +27,7 @@
                     <GradientStop Color="#CC3B93EC" Offset="0.004"/>
                     <GradientStop Color="#CC7ABBF9" Offset="1"/>
                 </LinearGradientBrush>
-            </TextBlock.Foreground>Epub Viewer <TextBlock Foreground="Gray" FontSize="15">Light Version</TextBlock></TextBlock>
+            </TextBlock.Foreground>Epub Viewer <TextBlock Foreground="Gray" FontSize="15">Standard Version</TextBlock></TextBlock>
         <Grid Margin="18,2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2.5*"/>
@@ -42,8 +42,8 @@
                     <Setter Property="FontSize" Value="14"/>
                 </Style>
             </Grid.Resources>
-            <TextBlock Margin="0,10" FontSize="16" FontWeight="Medium">Epub Viewer 1.1</TextBlock>
-            <TextBlock Grid.Row="1" FontSize="13" FontWeight="Medium">Epub Viewer 增强版正在开发中...</TextBlock>
+            <TextBlock Margin="0,10" FontSize="16" FontWeight="Medium">Epub Viewer 2.0</TextBlock>
+            <TextBlock Grid.Row="1" FontSize="13" FontWeight="Medium"></TextBlock>
             <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5">WebSite: 
                 <Hyperlink RequestNavigate="Hyperlink_OnRequestNavigate" NavigateUri="http://hustlei.github.io/proj/epubviewer-light.html">
                     http://hustlei.github.com</Hyperlink></TextBlock>

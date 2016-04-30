@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Lei.UI;assembly=MordenWin"
         LogoData="M5,15 L5,22 7,22 M12,16 L9,16 9,22 12,22 M9,19 L11,19 M15,15 L15,22"
-        Width="280" Height="110" ResizeMode="NoResize" ShowInTaskbar="False"
+        Width="280" Height="72" ResizeMode="NoResize" ShowInTaskbar="False" 
+         Deactivated="FindView_OnDeactivated" WindowStyle="None"
         Title="Search">
     <Window.Resources>
         <ResourceDictionary>
@@ -27,8 +28,9 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <TextBlock Margin="2,0,5,0" TextAlignment="Center" VerticalAlignment="Center">查 找:</TextBlock>
-        <TextBox x:Name="Text" Grid.Column="1" Margin="4"></TextBox>
-        <Button x:Name="Find" Grid.Column="1" Grid.Row="1" Width="80" Margin="5,3"
-                xml:space="preserve" HorizontalAlignment="Right">搜  索</Button>
+        <TextBox x:Name="Text" Grid.Column="1" Margin="4"/>
+        <StackPanel  Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Background="Transparent" MouseLeftButtonDown="FindView_OnMouseLeftButtonDown">
+        <Button x:Name="Find" Width="80" Margin="5,1"  Height="25"
+                xml:space="preserve" HorizontalAlignment="Right" FontSize="12">搜  索</Button></StackPanel>
     </Grid>
 </ui:MordenWindow>

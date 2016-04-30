@@ -23,8 +23,18 @@ namespace EpubViewer
     {
         public FindView()
         {
-            InitializeComponent();           
+            InitializeComponent();
+            Text.Focus();
         }
 
+        private void FindView_OnDeactivated(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void FindView_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
+        }
     }
 }

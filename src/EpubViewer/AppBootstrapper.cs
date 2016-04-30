@@ -49,14 +49,12 @@ namespace EpubViewer
         }
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            if (e.Args.Length > 0)
+                MainViewModel.Args = e.Args;//找不到更方便的方法。下面的方法不太适合传递/开关，虽然可以但不方便
             DisplayRootViewFor<MainViewModel>();
-            //MainWindow win = new MainWindow();
+            //以下代码可以正常工作
             //if (e.Args.Length > 0)
-            //{
-            //    string[] files = e.Args;
-            //    win.OpenFiles(files);
-            //}
-            //win.Show();
+            //    ((MainViewModel)IoC.GetInstance(typeof(MainViewModel), null)).OpenFiles(e.Args);
         }
         protected override object GetInstance(Type serviceType, string key)
         {

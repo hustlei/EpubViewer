@@ -26,22 +26,22 @@ namespace EpubViewer
             _epubList = new List<EpubBook>();
         }
 
-        public void OpenFiles(string[] files)
-        {
-            foreach (string file in files)
-            {
-                if (_epubList.Count == 0 || _epubList.Any(a => a.Filename != file))
-                {
-                    _epubList.Add(new EpubBook());
-                    if (!_epubList[_epubList.Count - 1].Open(file))
-                    {
-                        _epubList[_epubList.Count - 1].Close();
-                        _epubList.RemoveAt(_epubList.Count - 1);
-                        return;
-                    }
-                }
-            }
-        }
+        //public void OpenFiles(string[] files)
+        //{
+        //    foreach (string file in files)
+        //    {
+        //        if (_epubList.Count == 0 || _epubList.Any(a => a.Filename != file))
+        //        {
+        //            _epubList.Add(new EpubBook());
+        //            if (!_epubList[_epubList.Count - 1].Open(file))
+        //            {
+        //                _epubList[_epubList.Count - 1].Close();
+        //                _epubList.RemoveAt(_epubList.Count - 1);
+        //                return;
+        //            }
+        //        }
+        //    }
+        //}
         public Task<bool> OpenFilesAsync(string[] files)
         {
             foreach (string file in files)

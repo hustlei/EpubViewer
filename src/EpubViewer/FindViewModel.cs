@@ -21,6 +21,7 @@ namespace EpubViewer
             _forward = true;
             _matchcase = false;
             _findnext = true;
+            Text = "";
         }
         public string Text
         {
@@ -28,7 +29,7 @@ namespace EpubViewer
             get { return _text; }
         }
 
-        void Find()
+        public void Find()
         {
             if (Text.Trim() != "" && _browser != null)
             {

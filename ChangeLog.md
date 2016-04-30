@@ -3,11 +3,14 @@
 ## **Ver 1.1.0.1455** -- 2015.12.22
 ### New Features
 + EpubViewer添加闪屏图片，Views里也有（用于UI调试）
++ 添加命令行参数支持
++ 添加mode，用/mode:reader或/mode:helper命令行参数来确定是否显示菜单栏等
 
 ### Bug Fixes
 + 在MainViewModel构造函数里引用IWindowManager参数时，无法启动，添加ImportingConstructor属性解决。
 + 子窗口Owner属性无法绑定，在WindowManager打开窗口时通过settings参数设置。
-
++ 修正拖放无法打开文件问题
++ 修正菜单栏exit不能正常退出的问题
 
 ## **Ver 1.1.0.1450** -- 2015.12.20
 ### New Features
