@@ -5,7 +5,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Lei.Common;
 using Lei.UI;
 using winform = System.Windows.Forms;
 

@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using EpubViewer.Properties;
 
 namespace EpubViewer
 {
@@ -20,17 +21,18 @@ namespace EpubViewer
     {
         static App()
         {
-            conf(@"profiles\init.conf");
-            addPath(Environment.CurrentDirectory+"\\views\\cefx86");
-            AppDomain.CurrentDomain.UnhandledException +=
-                (sender, args) =>
-                {
-                    MessageBox.Show(((Exception) args.ExceptionObject).Message+"\n"+sender.ToString(), "Exception Unhandled");
-                    Environment.Exit(1);
-                };
+            conf(Settings.Default.confPath);
+            addPath(Environment.CurrentDirectory+"\\"+Settings.Default.cefPath);
+            //AppDomain.CurrentDomain.UnhandledException +=
+            //    (sender, args) =>
+            //    {
+            //        MessageBox.Show(((Exception) args.ExceptionObject).Message+"\n"+sender.ToString(), "Exception Unhandled");
+            //        Environment.Exit(1);
+            //    };
         }
         public App()
         {
+            //xaml中没有资源也没有设置StartupUri，就不会有InitializeComponent函数
             try
             {
                 var booter = new AppBootstrapper();
@@ -41,19 +43,28 @@ namespace EpubViewer
             }
         }
 
+
         // ReSharper disable once InconsistentNaming
-        private static void conf(string p)
+        /// <summary>
+        /// 设置config文件自定义路径
+        /// </summary>
+        /// <param name="confPath">相对路径</param>
+        private static void conf(string confPath)
         {
-            //AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", p);
+            //AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", confPath);
             var funsion = typeof(AppDomain).GetMethod("GetFusionContext", BindingFlags.NonPublic | BindingFlags.Instance);
             var fusionContext = funsion.Invoke(AppDomain.CurrentDomain, null);
             var m = typeof(AppDomainSetup).GetMethod("UpdateContextProperty", BindingFlags.NonPublic | BindingFlags.Static);
-            m.Invoke(null, new[] { fusionContext, "APP_CONFIG_FILE", p });
+            m.Invoke(null, new[] { fusionContext, "APP_CONFIG_FILE", confPath });
         }
 
-        private static void addPath(string p)
+        /// <summary>
+        /// 添加环境变量
+        /// </summary>
+        /// <param name="path">完整路径</param>
+        private static void addPath(string path)
         {
-            Environment.SetEnvironmentVariable("path", p+";" + Environment.GetEnvironmentVariable("path"));
+            Environment.SetEnvironmentVariable("path", path+";" + Environment.GetEnvironmentVariable("path"));
         }
     }
 }

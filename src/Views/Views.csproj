@@ -185,16 +185,6 @@
     <Resource Include="img\Forward.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EpubLib\EpubLib.csproj">
-      <Project>{6111c6d5-fd21-48dc-89cb-7425433d67b3}</Project>
-      <Name>EpubLib</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\EpubService\EpubService.csproj">
-      <Project>{59ae3aa9-9c24-4e5e-8142-0a84741e940e}</Project>
-      <Name>EpubService</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\MordenWin\MordenWin.csproj">
       <Project>{998d84c8-bcec-4d03-92ef-ff8174f0ad01}</Project>
       <Name>MordenWin</Name>

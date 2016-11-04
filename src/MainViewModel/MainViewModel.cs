@@ -21,14 +21,15 @@ using winform = System.Windows.Forms;
 using System.Threading.Tasks;
 using CefSharp;
 using Lei.Common;
+using Contracts;
 
 namespace EpubViewer
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    [Export(typeof (MainViewModel))]
-    public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive
+    [Export(typeof(IShell))]
+    public sealed class MainViewModel : Conductor<IScreen>.Collection.OneActive, IShell
     {
         private readonly IWindowManager _windowManager;
         private readonly EpubService _epubService;
@@ -36,9 +37,8 @@ namespace EpubViewer
         private static TaskScheduler TS = TaskScheduler.FromCurrentSynchronizationContext();
         private BindableCollection<ItemNode> _nodes;
         public string Mode = "Reader";
-        public static string[] Args;
 
-    public BindableCollection<ItemNode> Nodes
+        public BindableCollection<ItemNode> Nodes
         {
             get { return _nodes; }
             private set { _nodes = value; NotifyOfPropertyChange("Nodes"); }
@@ -75,27 +75,31 @@ namespace EpubViewer
             AllowDrop = true;
             Nodes = new BindableCollection<ItemNode>();
             SearchResult = new BindableCollection<ItemNode>();
+        }
 
-            if (Args!=null)
-                if (Args.Length > 0)
+        public void StartwithArgs(string[] args)
+        {
+            if (args != null)
+                if (args.Length > 0)
                 {
-                    List<string> fileNamesList=new List<string>();
-                    foreach (var arg in Args)
+                    List<string> fileNamesList = new List<string>();
+                    foreach (var arg in args)
                     {
                         if (arg.ToLower().StartsWith("/"))
                         {
-                            if (arg.ToLower().StartsWith("/mode:"))
-                                Mode = arg.Remove(0, 6);
+                            Mode = arg.TrimStart('/').Trim();
+                            var a = arg.TrimStart('/').Trim();
                         }
                         else
                         {
                             fileNamesList.Add(arg);
                         }
                     }
-                    OpenFiles(fileNamesList.ToArray());
+                    if (fileNamesList.Count > 0)
+                        OpenFiles(fileNamesList.ToArray());
                 }
-            if(Mode.ToLower()=="reader")
-                MenuVisible=Visibility.Visible;
+            if (Mode.ToLower() == "reader")
+                MenuVisible = Visibility.Visible;
             if (Mode.ToLower() == "helper")
             {
                 MenuVisible = Visibility.Collapsed;
@@ -147,6 +151,7 @@ namespace EpubViewer
         {
             var settings = new Dictionary<string, object> { { "Topmost", true }, { "Owner", GetView() } };//Owner不是依赖属性不能绑定,只能在这里设置
             _windowManager.ShowDialog(new ConfigViewModel(), null, settings);
+            //IoC.Get<IWindowManager>().ShowDialog(new ConfigViewModel(), null, settings);
         }
 
         public void Exit()
@@ -158,7 +163,7 @@ namespace EpubViewer
         {
             string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
             //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            string[] fileNames= { fileName };
+            string[] fileNames = { fileName };
             OpenFiles(fileNames);
         }
 
@@ -281,10 +286,10 @@ namespace EpubViewer
         {
             if (ActiveItem != null)
             {
-                var b = ((ContentTabItemViewModel) ActiveItem).WebBrowser;
+                var b = ((ContentTabItemViewModel)ActiveItem).WebBrowser;
                 var w = new FindViewModel(b);
                 var settings = new Dictionary<string, object> { { "Owner", GetView() }, { "WindowStartupLocation", WindowStartupLocation.CenterOwner } };
-                _windowManager.ShowWindow(w,null,settings);
+                _windowManager.ShowWindow(w, null, settings);
             }
         }
 
@@ -305,10 +310,11 @@ namespace EpubViewer
             set { _searchText = value; NotifyOfPropertyChange("SearchText"); }
         }
 
-        private BindableCollection<ItemNode> _searchResult; 
-        public BindableCollection<ItemNode> SearchResult {
+        private BindableCollection<ItemNode> _searchResult;
+        public BindableCollection<ItemNode> SearchResult
+        {
             get { return _searchResult; }
-            set { _searchResult = value;NotifyOfPropertyChange("SearchResult"); }
+            set { _searchResult = value; NotifyOfPropertyChange("SearchResult"); }
         }
 
         public void Search()

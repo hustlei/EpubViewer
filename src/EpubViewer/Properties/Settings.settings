@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="EpubViewer.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="confPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">profiles\\init.conf</Value>
+    </Setting>
+    <Setting Name="cefPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">views\\cefx86</Value>
+    </Setting>
+    <Setting Name="viewsPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">views</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
