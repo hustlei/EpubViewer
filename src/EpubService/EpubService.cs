@@ -18,7 +18,6 @@ namespace EpubViewer
     {
         private readonly List<EpubBook> _epubList;
 
-        //public readonly ObservableCollection<ItemNode> Nodes;
         public List<EpubBook> EpubList { get { return _epubList; } }
 
         public EpubService()
@@ -26,42 +25,59 @@ namespace EpubViewer
             _epubList = new List<EpubBook>();
         }
 
-        //public void OpenFiles(string[] files)
-        //{
-        //    foreach (string file in files)
-        //    {
-        //        if (_epubList.Count == 0 || _epubList.Any(a => a.Filename != file))
-        //        {
-        //            _epubList.Add(new EpubBook());
-        //            if (!_epubList[_epubList.Count - 1].Open(file))
-        //            {
-        //                _epubList[_epubList.Count - 1].Close();
-        //                _epubList.RemoveAt(_epubList.Count - 1);
-        //                return;
-        //            }
-        //        }
-        //    }
-        //}
-        public Task<bool> OpenFilesAsync(string[] files)
+        /// <summary>
+        /// 打开epub文件
+        /// </summary>
+        /// <param name="file">文件名，完整路径</param>
+        /// <returns>返回新打开的文件在EpubList中的序号，null表示打开失败</returns>
+        public int? OpenFile(string file)
         {
-            foreach (string file in files)
+            if (_epubList.Count > 0 && _epubList.Any(epub => epub.Filename == file))
+                return null;
+            _epubList.Add(new EpubBook());
+            int index = _epubList.Count - 1;
+            if (!_epubList[index].Open(file))
             {
-                if (_epubList.Count == 0 || _epubList.Any(a => a.Filename != file))
-                {
-                    _epubList.Add(new EpubBook());
-                    var t = _epubList[_epubList.Count - 1].OpenAsync(file);
-                    return t.ContinueWith(t1 =>
-                    {
-                        if (t1.Result)
-                            return true;
-                        _epubList[_epubList.Count - 1].Close();
-                        _epubList.RemoveAt(_epubList.Count - 1);
-                        return false;
-                    });
-                }
-                return Task<bool>.Factory.StartNew(() => false);
+                _epubList[index].Close();
+                _epubList.RemoveAt(index);
+                return null;
             }
-            return Task<bool>.Factory.StartNew(() => false);
+            return index;
+        }
+
+        /// <summary>
+        /// 异步打开epub文件
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>返回一个Task对象，Task.Result为新打开的文件在EpubList中的序号，Task.Result为null表示打开失败</returns>
+        public Task<int?> OpenFileAsync(string file)
+        {
+            if (_epubList.Count > 0 && _epubList.Any(epub => epub.Filename == file))
+                return Task<int?>.Factory.StartNew(() => null);
+
+            _epubList.Add(new EpubBook());//这一句必须在UI线程上执行
+            int index = _epubList.Count - 1;
+
+            var t = _epubList[index].OpenAsync(file);
+            return t.ContinueWith<int?>(t1 =>
+            {
+                if (t1.Result)
+                    return index;
+
+                _epubList[index].Close();
+                _epubList.RemoveAt(index);
+                return null;
+            });
+            //var t = _epubList[index].OpenAsync(file);
+            //return t.ContinueWith(t1 =>
+            //{
+            //    if (t1.Result)
+            //        return true;
+
+            //    _epubList[index].Close();
+            //    _epubList.RemoveAt(index);
+            //    return false;
+            //});
         }
 
         public void CloseFiles()

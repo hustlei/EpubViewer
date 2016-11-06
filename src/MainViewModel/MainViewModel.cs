@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -19,9 +20,11 @@ using System.Windows.Shapes;
 using Caliburn.Micro;
 using winform = System.Windows.Forms;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using CefSharp;
 using Lei.Common;
 using Contracts;
+using Path = System.IO.Path;
 
 namespace EpubViewer
 {
@@ -41,22 +44,37 @@ namespace EpubViewer
         public BindableCollection<ItemNode> Nodes
         {
             get { return _nodes; }
-            private set { _nodes = value; NotifyOfPropertyChange("Nodes"); }
+            private set
+            {
+                _nodes = value;
+                NotifyOfPropertyChange("Nodes");
+            }
         }
 
         private Visibility _waitingVisible;
+
         public Visibility WaitingVisible
         {
             get { return _waitingVisible; }
-            set { _waitingVisible = value; NotifyOfPropertyChange("WaitingVisible"); }
+            set
+            {
+                _waitingVisible = value;
+                NotifyOfPropertyChange("WaitingVisible");
+            }
         }
 
         private Visibility _menuVisible = Visibility.Visible;
+
         public Visibility MenuVisible
         {
             get { return _menuVisible; }
-            set { _menuVisible = value; NotifyOfPropertyChange("MenuVisible"); }
+            set
+            {
+                _menuVisible = value;
+                NotifyOfPropertyChange("MenuVisible");
+            }
         }
+
         public bool AllowDrop { get; set; }
 
         [ImportingConstructor]
@@ -77,7 +95,7 @@ namespace EpubViewer
             SearchResult = new BindableCollection<ItemNode>();
         }
 
-        public void StartwithArgs(string[] args)
+        public void ProcessArgs(string[] args)
         {
             if (args != null)
                 if (args.Length > 0)
@@ -106,6 +124,7 @@ namespace EpubViewer
                 DisplayName = "Help Viewer";
             }
         }
+
         public void FileOpen()
         {
             if (_openDlg.ShowDialog() == winform.DialogResult.OK)
@@ -119,28 +138,36 @@ namespace EpubViewer
 
         public void OpenFiles(string[] fileNames)
         {
-            WaitingVisible = Visibility.Visible;
-            var t = _epubService.OpenFilesAsync(fileNames);
-            t.ContinueWith(t1 =>
+            foreach (var f in fileNames)
             {
-                if (t1.Result)
+                try
                 {
-                    try
+                    WaitingVisible = Visibility.Visible;
+                    string file=f;
+                    if (!Path.IsPathRooted(f))
+                        file = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + f;
+                    var t =_epubService.OpenFileAsync(file);
+                    t.ContinueWith(t1 =>
                     {
-                        Nodes.Add(_epubService.EpubList[_epubService.EpubList.Count - 1].TocNode);
-                        Nodes[Nodes.Count - 1].IsExpanded = true;
-                        Nodes[Nodes.Count - 1].IsSelected = true;
-                        Nodes[0].Icon = ItemNode.ExpandedIcon;
-                        if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
-                            ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
+                        if(t1.Result!=null)
+                        {
+                            int index = (int) t1.Result;
+                            Nodes.Add(_epubService.EpubList[index].TocNode);
+                            
+                            Nodes[index].IsExpanded = true;
+                            Nodes[index].IsSelected = true;
+                            Nodes[0].Icon = ItemNode.ExpandedIcon;
+                            if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
+                                ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
+                        }
+                        WaitingVisible = Visibility.Collapsed;
+                    }, TaskScheduler.Default);// TaskScheduler.FromCurrentSynchronizationContext());
                 }
-                WaitingVisible = Visibility.Collapsed;
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
         public void FileClose()
         {
@@ -200,8 +227,9 @@ namespace EpubViewer
                     MessageBox.Show("未找到页面。");
                 }
             }
-            catch
+            catch(Exception e1)
             {
+                //MessageBox.Show(e1.Message, e1.Source);
             }
         }
         # endregion

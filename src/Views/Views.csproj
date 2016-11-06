@@ -145,6 +145,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controls\ContentTabItemView.xaml.cs">
+      <DependentUpon>ContentTabItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Waiting.xaml.cs">
       <DependentUpon>Waiting.xaml</DependentUpon>
     </Compile>

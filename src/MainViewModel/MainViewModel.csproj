@@ -140,6 +140,7 @@
     <ProjectReference Include="..\Contracts\Contracts.csproj">
       <Project>{9d384fc7-3fd2-43a6-a46c-be0fe315cddc}</Project>
       <Name>Contracts</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\EpubLib\EpubLib.csproj">
       <Project>{6111c6d5-fd21-48dc-89cb-7425433d67b3}</Project>

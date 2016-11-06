@@ -11,6 +11,7 @@ EpubLib内仅包含一个类EpubBook，可以读取一个Epub文件，EpubBook�
 
 + 方法/函数：
     - OpenFile(string filename)：读取epubfile
+	- OpenAsync(string filename)：异步打开epubfile，并且保证TreeNode的操作都是在调用的线程上执行的（只要调用OpenAsync的线程是UI线程，TreeNode就能直接绑定到xaml上）。
     - CloseFile():关闭文档，清空所有属性，删除缓存文档，在程序关闭前必须调用该函数，否则会占用系统临时目录空间。
 + 属性:
     - TreeNode TreeNode:Epub目录树

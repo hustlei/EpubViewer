@@ -111,6 +111,7 @@ namespace Lei.Common
             set
             {
                 _isSelected = value == true;
+                NotifyOfPropertyChange("IsSelected");
                 if (Nodes.Count == 0)
                     Icon = _isSelected ? PageIconSelected : PageIcon;
                 else if (_isExpanded)
@@ -128,7 +129,6 @@ namespace Lei.Common
                         n = n.Parent;
                     }
                 }
-                NotifyOfPropertyChange("IsSelected");
             }
         }
         public BindableCollection<ItemNode> Nodes { get; set; }

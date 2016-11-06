@@ -69,7 +69,7 @@ namespace EpubViewer
             //if (e.Args.Length > 0) //需要VM和Bootstrapper在一个程序集
             //    MainViewModel.Args = e.Args;//找不到更方便的方法。
             DisplayRootViewFor<IShell>();
-            IoC.Get<IShell>().StartwithArgs(e.Args);
+            IoC.Get<IShell>().ProcessArgs(e.Args);
             //以下代码可以正常工作。不太适合传递/开关，虽然可以但不方便
             //if (e.Args.Length > 0)
             //    ((MainViewModel)IoC.GetInstance(typeof(MainViewModel), null)).OpenFiles(e.Args);

@@ -1,6 +1,22 @@
 # **Changelog**
 
+
+## **Ver 1.1.0.1460** -- 2016.10.01
+
+### New Features
++ 添加Contract，分离ViewModel到单独的程序集
++ 修改命令行参数支持方式
++ 命令行参数的/mode:reader和/mode:helper修改为/reader和/helper
++ 修改EpubService打开多个文件方法为打开单个文件，更为灵活
++ 增加相对路径支持
+
+### Bug Fixes
++ 修复reader,helper模式不管用的问题
++ 修复异步打开多个文件时，只有第一个文件能显示的问题
+
+
 ## **Ver 1.1.0.1455** -- 2015.12.22
+
 ### New Features
 + EpubViewer添加闪屏图片，Views里也有（用于UI调试）
 + 添加命令行参数支持
@@ -12,7 +28,9 @@
 + 修正拖放无法打开文件问题
 + 修正菜单栏exit不能正常退出的问题
 
+
 ## **Ver 1.1.0.1450** -- 2015.12.20
+
 ### New Features
 + App类添加了一个纯代码实现的方法，当然默认不使用
 + 软件图标资源改到EpubViewer项目内
@@ -25,11 +43,13 @@
 
 
 ## **Ver 1.1.0.1435** -- 2015.12.16
+
 ### New Features
 + 采用Caliburn Micro框架
 
 
 ## **Ver 1.1.0.1430** -- 2015.12.15
+
 ### New Features
 + 增加设置对话框，可以设置关联文件到本软件及取消关联，关联epub文件图标
 + 把图标单独放在rc4net.dll里
@@ -45,6 +65,7 @@
 
 
 ## **Ver 1.1.0.1420** -- 2015.12.14
+
 ### New Features
 + 增加设置对话框，可以设置关联文件到本软件及取消关联，关联epub文件图标
 + 工具栏增加打开文件、关闭文件按钮
@@ -54,19 +75,22 @@
 ### New Features
 + 异步多线程打开Epub文件更新UI功能由BackGroundWorker更改为Task+CurrentSynchronizationContext
 
+
 ## **Ver 1.1.0.1400** -- 2015.12.12
+
 ### Features
 + 版本增加到v1.1
 + 修改About页面版本信息
 
+
 ## **Ver 1.0.0.1240** -- 2015.12.11
+
 ### Features
 + 添加拖放打开文件功能
 
-### Bug Fixes
-+ @hustlei 
 
 ## **Ver 1.0.0.1230** -- 2015.12.10
+
 ### Features
 + 重构EpubLib
 + 实现异步打开Epub文件
@@ -75,7 +99,9 @@
 ### Bug Fixes
 + @hustlei 修正Close后EpubBookList内未删除文件的问题
 
+
 ## **Ver 1.0.0.100** -- 2015.10.20
+
 ### Features
 + 可以同时打开多个Epub文件
 + 可以多标签显示Epub电子书文章
