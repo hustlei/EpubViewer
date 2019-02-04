@@ -19,7 +19,7 @@
 !define Project ${PRODUCT_NAME}
 !define PRODUCT_VERSION "1.1"
 !define PRODUCT_PUBLISHER "lilei"
-!define PRODUCT_WEB_SITE "http://hustlei.github.io"
+!define PRODUCT_WEB_SITE "http://hustlei.ml"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_NAME}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -184,6 +184,8 @@ SectionEnd
 Section Uninstall
 	;为了方便无论有没有关联文件格式都尝试取消关联
 	!insertmacro UnAssoc "epub,epub3"
+	!insertmacro UnAssoc "epub"
+	!insertmacro UnAssoc "epub3"
 	System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
 
 	Delete "$INSTDIR\${PRODUCT_NAME}.url"

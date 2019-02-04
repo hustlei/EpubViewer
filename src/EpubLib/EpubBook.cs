@@ -472,6 +472,7 @@ namespace Lei.Common
             }
             //读取NCX目录
             TocNode = new ItemNode(this.Title, "", ItemNode.CollepsedIcon);
+            TocNode.Tag = this.Filename;
             if (!IsSpine)
                 this.readTocNCX(TocNode, toc);
 

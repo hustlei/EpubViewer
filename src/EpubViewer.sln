@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{4274294F-D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Solution Items", "@Solution Items", "{2FA562FF-0032-4683-8B1C-ADDDB188B3E8}"
 	ProjectSection(SolutionItems) = preProject
+		Bugs.md = Bugs.md
 		..\ChangeLog.md = ..\ChangeLog.md
 		..\LICENSE = ..\LICENSE
 		..\ReadMe.md = ..\ReadMe.md

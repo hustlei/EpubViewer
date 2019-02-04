@@ -21,6 +21,7 @@ namespace Lei.Common
         public static ImageSource ExpandedIconSelected;
         public static ImageSource CollepsedIconSelected;
         public static ImageSource PageIconSelected;
+        public static ItemNode selectedNode = null;
 
         static ItemNode()
         {
@@ -111,6 +112,11 @@ namespace Lei.Common
             set
             {
                 _isSelected = value == true;
+                if (_isSelected)
+                {
+                    selectedNode.IsSelected = false;
+                    selectedNode = this;
+                }
                 NotifyOfPropertyChange("IsSelected");
                 if (Nodes.Count == 0)
                     Icon = _isSelected ? PageIconSelected : PageIcon;

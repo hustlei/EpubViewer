@@ -86,6 +86,18 @@ namespace EpubViewer
             {
                 epub.Close();
             }
+            _epubList.Clear();
+        }
+
+        public void CloseFile(String fileName)
+        {
+            foreach (var epub in EpubList)
+            {
+                if ((string) epub.TocNode.Tag != fileName) continue;
+                EpubList.Remove(epub);
+                epub.Close();
+                break;
+            }
         }
 
         ~EpubService()

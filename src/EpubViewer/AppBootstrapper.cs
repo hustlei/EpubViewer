@@ -35,7 +35,7 @@ namespace EpubViewer
                     .Where(file => file.EndsWith("dll", true, CultureInfo.CurrentCulture) || file.EndsWith("exe", true, CultureInfo.CurrentCulture))
                     .Select(Assembly.LoadFrom));
             //lst.AddRange(from file in Directory.GetFiles(Environment.CurrentDirectory + @"\views") where file.EndsWith("dll") || file.EndsWith("exe") select Assembly.LoadFrom(file));
-            lst.Add(Assembly.LoadFrom(System.Environment.CurrentDirectory+@"\presenter\MainViewModel.dll"));
+            lst.Add(Assembly.LoadFrom(App.basePath+@"\presenter\MainViewModel.dll"));
             return lst;
         }
 

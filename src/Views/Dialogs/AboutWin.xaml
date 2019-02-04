@@ -45,10 +45,11 @@
             <TextBlock Margin="0,10" FontSize="16" FontWeight="Medium">Epub Viewer 2.0</TextBlock>
             <TextBlock Grid.Row="1" FontSize="13" FontWeight="Medium"></TextBlock>
             <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5">WebSite: 
-                <Hyperlink RequestNavigate="Hyperlink_OnRequestNavigate" NavigateUri="http://hustlei.github.io/proj/epubviewer-light.html">
-                    http://hustlei.github.com</Hyperlink></TextBlock>
+                <Hyperlink RequestNavigate="Hyperlink_OnRequestNavigate" NavigateUri="http://miscsoft.ml">
+                    http://miscsoft.ml/</Hyperlink></TextBlock>
             <TextBlock Grid.Row="3" Foreground="Gray">(c) Hustlei 2015. All Rights Reversed.</TextBlock>
-            <TextBlock Grid.Row="4" Foreground="Gray">hustlei, 2015 @WuHan</TextBlock>
+            <TextBlock Grid.Row="4" Foreground="Gray">
+                <Hyperlink RequestNavigate="Hyperlink_OnRequestNavigate" NavigateUri="http://hustlei.ml">hustlei</Hyperlink>, 2015-2017 @WuHan</TextBlock>
         </Grid>
     </DockPanel>
 </ui:MordenWindow>

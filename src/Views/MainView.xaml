@@ -34,6 +34,7 @@
                     </MenuItem.Header>
                     <MenuItem Header="打开" cm:Message.Attach="FileOpen"/>
                     <MenuItem Header="关闭" cm:Message.Attach="FileClose"/>
+                    <MenuItem Header="关闭所有" cm:Message.Attach="FilesClose"/>
                     <Separator/>
                     <MenuItem Header="退出" cm:Message.Attach="Exit"/>
                 </MenuItem>
@@ -116,7 +117,7 @@
                 <TabControl Grid.Column="0" TabStripPlacement="Bottom" ToolBarTray.IsLocked="True" Margin="0,0,0,2"
                         Background="Transparent" ClipToBounds="True">
                     <TabItem Header="目录" MinWidth="60" BorderBrush="LightGray" BorderThickness="1,0,1,1">
-                        <TreeView x:Name="TocTreeView" ItemsSource="{Binding Nodes}"
+                        <TreeView x:Name="TocTreeView" ItemsSource="{Binding Nodes}" 
                                  cm:Message.Attach="[Event SelectedItemChanged]=[Action TocSelectedItemChanged($eventArgs)]">
                             <!---->
                             <TreeView.ItemContainerStyle>

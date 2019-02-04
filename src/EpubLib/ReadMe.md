@@ -18,6 +18,7 @@ EpubLib内仅包含一个类EpubBook，可以读取一个Epub文件，EpubBook�
 	    * name属性存储url
 		* text属性存储章节/文章名称
         * ImageIndex存储图标序号
+		* 根节点的Tag存储FileName
     - static ImageList ImageList;按顺序存储文件夹图标、打开的文件夹图标、文件图标
     - bool IsSpine;是否读取顺序阅读目录，默认为否
     - string Filename：文件名称

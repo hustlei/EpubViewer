@@ -41,6 +41,7 @@ namespace EpubViewer
         private BindableCollection<ItemNode> _nodes;
         public string Mode = "Reader";
 
+        #region Properties
         public BindableCollection<ItemNode> Nodes
         {
             get { return _nodes; }
@@ -76,6 +77,7 @@ namespace EpubViewer
         }
 
         public bool AllowDrop { get; set; }
+        #endregion Properties
 
         [ImportingConstructor]
         public MainViewModel(IWindowManager windowManager)
@@ -100,7 +102,7 @@ namespace EpubViewer
             if (args != null)
                 if (args.Length > 0)
                 {
-                    List<string> fileNamesList = new List<string>();
+                    var fileNamesList = new List<string>();
                     foreach (var arg in args)
                     {
                         if (arg.ToLower().StartsWith("/"))
@@ -116,12 +118,15 @@ namespace EpubViewer
                     if (fileNamesList.Count > 0)
                         OpenFiles(fileNamesList.ToArray());
                 }
-            if (Mode.ToLower() == "reader")
-                MenuVisible = Visibility.Visible;
-            if (Mode.ToLower() == "helper")
+            switch (Mode.ToLower())
             {
-                MenuVisible = Visibility.Collapsed;
-                DisplayName = "Help Viewer";
+                case "reader":
+                    MenuVisible = Visibility.Visible;
+                    break;
+                case "helper":
+                    MenuVisible = Visibility.Collapsed;
+                    DisplayName = "Help Viewer";
+                    break;
             }
         }
 
@@ -143,36 +148,63 @@ namespace EpubViewer
                 try
                 {
                     WaitingVisible = Visibility.Visible;
-                    string file=f;
+                    string file = f;
                     if (!Path.IsPathRooted(f))
                         file = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + f;
-                    var t =_epubService.OpenFileAsync(file);
+                    var t = _epubService.OpenFileAsync(file);
                     t.ContinueWith(t1 =>
                     {
-                        if(t1.Result!=null)
+                        try
                         {
-                            int index = (int) t1.Result;
-                            Nodes.Add(_epubService.EpubList[index].TocNode);
-                            
-                            Nodes[index].IsExpanded = true;
-                            Nodes[index].IsSelected = true;
-                            Nodes[0].Icon = ItemNode.ExpandedIcon;
-                            if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
-                                ((ContentTabItemViewModel)ActiveItem).UseDocumentTitle = true;
+                            if (t1.Result != null)
+                            {
+                                int index = (int) t1.Result;
+                                Nodes.Add(_epubService.EpubList[index].TocNode);
+                                for (int i = 0; i < Nodes.Count; i++)
+                                {
+                                    Nodes[i].IsExpanded = false;
+                                }
+                                Nodes[index].IsExpanded = true;
+                                Nodes[index].IsSelected = true;
+                                TocSelectedItemChanged(new RoutedPropertyChangedEventArgs<object>(null,Nodes[index]));
+                                //Nodes[0].Icon = ItemNode.ExpandedIcon;
+                                if (_epubService.EpubList.Count > 0 && _epubService.EpubList[0].IsSpine)
+                                    ((ContentTabItemViewModel) ActiveItem).UseDocumentTitle = true;
+                            }
                         }
-                        WaitingVisible = Visibility.Collapsed;
+                        catch (Exception) { }
+                        finally { WaitingVisible = Visibility.Collapsed;}
                     }, TaskScheduler.Default);// TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show(ex.Message); WaitingVisible = Visibility.Collapsed;
                 }
             }
         }
         public void FileClose()
         {
+            if (ItemNode.selectedNode != null)
+            {
+                var n = ItemNode.selectedNode;
+                while (true)
+                {
+                    if (n.Parent == null)
+                        break;
+                    n = n.Parent;
+                }
+                if (((String) n.Tag).Trim().Length > 0)
+                {
+                    _epubService.CloseFile(n.Tag.ToString());
+                    Nodes.Remove(n);
+                }
+            }
+        }
+        public void FilesClose()
+        {
             _epubService.CloseFiles();
-            Items.Clear();
+            Nodes.Clear();//Items.Clear();
+            //ItemNode.selectedNode = null;
         }
         public void Config()
         {
@@ -183,15 +215,24 @@ namespace EpubViewer
 
         public void Exit()
         {
-            FileClose();
+            FilesClose();
             Environment.Exit(0);
         }
         public void Drop(DragEventArgs e)
         {
-            string fileName = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
-            //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            string[] fileNames = { fileName };
-            OpenFiles(fileNames);
+            try
+            {
+                string fileName = ((System.Array) e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+                //if (File.Exists(fileName))
+                //{
+                //string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+                string[] fileNames = {fileName};
+                OpenFiles(fileNames);
+            }
+            catch (Exception)
+            {
+                ;
+            }
         }
 
         public void DragEnter(DragEventArgs e)
@@ -203,31 +244,28 @@ namespace EpubViewer
         #region 左边栏treeview相关函数
         public void TocSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
-            ItemNode node = e.NewValue as ItemNode;
+            ItemNode.selectedNode = e.NewValue as ItemNode;
             try
             {
                 string url = "";
                 string text = "";
 
-                if (node != null)
+                if (ItemNode.selectedNode != null)
                 {
-                    url = node.Name;
-                    text = node.Text;
+                    url = ItemNode.selectedNode.Name.Trim();
+                    text = ItemNode.selectedNode.Text;
                 }
-                if (url != "")
+                if (url.Length == 0)
                 {
+                    url = "about:blank";
+                }
                     if (ActiveItem == null)
                         NewTab();
-                    ((ContentTabItemViewModel)ActiveItem).Address = url;
-                    ((ContentTabItemViewModel)ActiveItem).DisplayName = text;
-                    (e.Source as TreeView).Focus();
-                }
-                else
-                {
-                    MessageBox.Show("未找到页面。");
-                }
+                ((ContentTabItemViewModel)ActiveItem).DisplayName = text;
+               ((ContentTabItemViewModel)ActiveItem).Address = url;
+                (e.Source as TreeView).Focus();
             }
-            catch(Exception e1)
+            catch (Exception e1)
             {
                 //MessageBox.Show(e1.Message, e1.Source);
             }
