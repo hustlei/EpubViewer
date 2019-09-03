@@ -1,3 +1,9 @@
+*.dll
+cefx86/
+win/
+*.sdf
+*.opensdf
+
 .vs/
 *.suo
 *.user
