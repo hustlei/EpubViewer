@@ -14,7 +14,7 @@
 
 # Screenshot
 
-<img src="https://github.com/hustlei/EpubViewer/blob/dev/src/Resources/image/screenshot/EpubViewer_v1.1.png" height=300>
+<img src="https://raw.githubusercontent.com/hustlei/EpubViewer/master/src/Resources/image/screenshot/EpubViewer_v1.1.png" height=300>
 
 # 编译
 
